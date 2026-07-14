@@ -1,0 +1,21 @@
+{
+  "extraKnownMarketplaces": {
+    "impeccable": {
+      "source": {
+        "source": "github",
+        "repo": "pbakaus/impeccable"
+      }
+    },
+    "thedotmack": {
+      "source": {
+        "source": "github",
+        "repo": "thedotmack/claude-mem"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "impeccable@impeccable": true,
+    "claude-mem@thedotmack": true,
+    "superpowers@claude-plugins-official": true
+  }
+}
