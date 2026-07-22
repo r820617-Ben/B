@@ -1,6 +1,6 @@
-# ── 個人化檔案（採用者填的，不該進公開 repo）──
-profiles/
-config.py
+# ── 個人化檔案 ──
+# （上游公開 repo 排除 profiles/ 和 config.py；這裡是 Ben 的私人 repo，
+#   個人化檔案要進版控才能跨 session 保留，所以不排除）
 *.local.*
 
 # ── 媒體 / 素材（版權 + 體積，絕不入庫）──

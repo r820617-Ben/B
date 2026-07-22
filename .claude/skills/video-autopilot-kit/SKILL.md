@@ -15,11 +15,12 @@ description: >-
 
 ## 使用前先確認
 
-1. **尚未個人化**：`profiles/` 還沒建立。第一次幫 Ben 用這個 skill 做影片相關任務時，
-   照 `SETUP.md` 的 ★必答 3 區（品牌、Niche、製作設定）訪談他，把答案生成 `profiles/`
-   （`brand.md`、`voice.md`、`algorithm.md`、`community.md`、`content_pipeline.md`、`your_context.md`），
-   並把 `config.example.py` 複製成 `config.py` 填他的路徑。已有 `profiles/` 就直接沿用。
+1. **已個人化**：Ben 的設定在 `profiles/`（brand / voice / content_pipeline / your_context /
+   algorithm / community）。做任何影片任務前先讀 `profiles/`，尤其 `content_pipeline.md`
+   （主力＝60–90s 露臉口播，9:16，IG Reels + YT Shorts 雙發，Path 1 純程式）。
+   檔內 `[待補]` 佔位（頻道名、BGM 路徑、腳本樣本、數據）遇到需要時再問 Ben 補。
 2. **語氣規範**：產出腳本 / 文案時，Ben 自己的 brand-voice 與 anti-style 規則優先於本 kit 的 style framework。
+   幫客戶產出時語氣跟客戶品牌走，不套 Ben 的 voice。
 
 ## 路徑選擇（決策樹）
 
