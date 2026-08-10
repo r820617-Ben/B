@@ -4,15 +4,17 @@
 // 建置：node build_deck.js
 
 const pptxgen = require("pptxgenjs");
+const fs = require("fs");
+const path = require("path");
 
-// ── 色票（大地色系，精品感）
-const ESPRESSO = "2E2A26";
-const TERRA = "B85042";
-const SAGE = "A7BEAE";
-const SAND = "EFEAE3";
+// ── 色票（知育品牌藍，取自 LOGO）
+const NAVY = "14264D"; // 品牌深藍：深色底與標題
+const BRAND = "284EA0"; // 品牌主色，取自知育 LOGO 實色填充
+const GOLD = "C9A227"; // 深藍底上的強調色
+const TINT = "EEF2F9"; // 卡片底色
 const WHITE = "FFFFFF";
-const MUTED = "7A736C";
-const LINE = "DED7CE";
+const MUTED = "6E7689";
+const LINE = "D8E0EF";
 
 const HEAD = "Cambria";
 const BODY = "Calibri";
@@ -29,11 +31,97 @@ pres.title = "企業人力資源提升計畫｜計劃說明與服務內容";
 
 let pageNo = 0;
 
+// ── 品牌標誌 ───────────────────────────────────────────────
+// assets/ 內若有 LOGO 檔就自動置入；沒有則改用文字標準字，版面不受影響。
+// 檔案來源與命名規則見 assets/README.md。
+const LOGO_ON_LIGHT = path.join(__dirname, "assets", "知育LOGO.png");
+const LOGO_ON_DARK = path.join(__dirname, "assets", "白色LOGO.png");
+
+function logoData(file) {
+  try {
+    if (!fs.existsSync(file)) return null;
+    return "image/png;base64," + fs.readFileSync(file).toString("base64");
+  } catch (e) {
+    return null;
+  }
+}
+
+const LOGO = { light: logoData(LOGO_ON_LIGHT), dark: logoData(LOGO_ON_DARK) };
+
+// 標誌置入：onDark 決定用白色版或彩色版；沒有圖檔時退回文字標準字。
+// h 為標誌高度，寬度依 LOGO 原始比例 537:391 換算。
+function placeLogo(s, x, y, h, onDark) {
+  const data = onDark ? LOGO.dark : LOGO.light;
+  if (data) {
+    s.addImage({ data, x, y, w: h * (537 / 391), h });
+    return;
+  }
+  s.addText("知育行銷", {
+    x,
+    y,
+    w: 1.9,
+    h: h * 0.66,
+    fontFace: HEAD,
+    fontSize: Math.round(h * 36),
+    bold: true,
+    color: onDark ? WHITE : BRAND,
+    charSpacing: 1,
+    margin: 0,
+  });
+  s.addText("ZHIYU MARKETING", {
+    x,
+    y: y + h * 0.66,
+    w: 1.9,
+    h: h * 0.4,
+    fontFace: BODY,
+    fontSize: Math.max(7, Math.round(h * 15)),
+    bold: true,
+    color: onDark ? GOLD : MUTED,
+    charSpacing: 1.4,
+    margin: 0,
+  });
+}
+
+// 靠右對齊置入：rightX 為標誌右緣要落在的位置
+function placeLogoRight(s, rightX, y, h, onDark, quiet) {
+  const data = onDark ? LOGO.dark : LOGO.light;
+  if (data) {
+    const w = h * (537 / 391);
+    s.addImage({ data, x: rightX - w, y, w, h });
+    return;
+  }
+  s.addText("知育行銷", {
+    x: rightX - 1.9,
+    y,
+    w: 1.9,
+    h: h * 0.66,
+    align: "right",
+    fontFace: HEAD,
+    fontSize: Math.round(h * 36),
+    bold: true,
+    color: onDark ? WHITE : quiet ? NAVY : BRAND,
+    margin: 0,
+  });
+  s.addText("ZHIYU MARKETING", {
+    x: rightX - 1.9,
+    y: y + h * 0.66,
+    w: 1.9,
+    h: h * 0.4,
+    align: "right",
+    fontFace: BODY,
+    fontSize: Math.max(7, Math.round(h * 15)),
+    bold: true,
+    color: onDark ? GOLD : MUTED,
+    charSpacing: 1.2,
+    margin: 0,
+  });
+}
+
 // ── 版型工具 ───────────────────────────────────────────────
 
 function darkSlide() {
   const s = pres.addSlide();
-  s.background = { color: ESPRESSO };
+  s.background = { color: NAVY };
   return s;
 }
 
@@ -55,6 +143,7 @@ function pageTag(s) {
 function contentSlide(kicker, title, sub) {
   const s = pres.addSlide();
   s.background = { color: WHITE };
+  placeLogoRight(s, W - M, 0.38, 0.34, false, true);
   s.addText(kicker, {
     x: M,
     y: 0.42,
@@ -63,7 +152,7 @@ function contentSlide(kicker, title, sub) {
     fontFace: BODY,
     fontSize: 11,
     bold: true,
-    color: TERRA,
+    color: BRAND,
     charSpacing: 2,
     margin: 0,
   });
@@ -75,7 +164,7 @@ function contentSlide(kicker, title, sub) {
     fontFace: HEAD,
     fontSize: 32,
     bold: true,
-    color: ESPRESSO,
+    color: NAVY,
     margin: 0,
   });
   if (sub) {
@@ -101,8 +190,8 @@ function card(s, x, y, w, h, fill) {
     w,
     h,
     rectRadius: 0.08,
-    fill: { color: fill || SAND },
-    line: { color: fill === WHITE ? LINE : fill || SAND, width: 1 },
+    fill: { color: fill || TINT },
+    line: { color: fill === WHITE ? LINE : fill || TINT, width: 1 },
     shadow: { type: "outer", color: "000000", blur: 10, offset: 2, angle: 90, opacity: 0.06 },
   });
 }
@@ -114,8 +203,8 @@ function numCircle(s, x, y, n, size, fill, txtColor) {
     y,
     w: d,
     h: d,
-    fill: { color: fill || TERRA },
-    line: { color: fill || TERRA, width: 1 },
+    fill: { color: fill || BRAND },
+    line: { color: fill || BRAND, width: 1 },
   });
   s.addText(String(n), {
     x,
@@ -146,7 +235,7 @@ function bullets(s, items, opts) {
       h: o.h,
       fontFace: BODY,
       fontSize: o.fontSize || 13,
-      color: o.color || ESPRESSO,
+      color: o.color || NAVY,
       lineSpacingMultiple: 1.1,
       paraSpaceAfter: o.paraSpaceAfter || 6,
       margin: 0,
@@ -170,7 +259,8 @@ function footnote(s, text, y) {
 
 function divider(no, kicker, title, desc) {
   const s = darkSlide();
-  numCircle(s, M, 2.35, no, 0.72, TERRA, WHITE);
+  placeLogoRight(s, W - M, 0.42, 0.34, true);
+  numCircle(s, M, 2.35, no, 0.72, GOLD, NAVY);
   s.addText(kicker, {
     x: M,
     y: 3.25,
@@ -179,7 +269,7 @@ function divider(no, kicker, title, desc) {
     fontFace: BODY,
     fontSize: 12,
     bold: true,
-    color: SAGE,
+    color: GOLD,
     charSpacing: 2,
     margin: 0,
   });
@@ -201,7 +291,7 @@ function divider(no, kicker, title, desc) {
     h: 0.4,
     fontFace: BODY,
     fontSize: 14,
-    color: "C9C1B8",
+    color: "C2CDE4",
     margin: 0,
   });
   pageTag(s);
@@ -224,15 +314,15 @@ function table(s, head, rows, colW, y, rowH, fontSize) {
     [
       head.map((h) => ({
         text: h,
-        options: { bold: true, color: WHITE, fill: { color: ESPRESSO } },
+        options: { bold: true, color: WHITE, fill: { color: NAVY } },
       })),
       ...rows.map((r, i) =>
         r.map((c, j) => ({
           text: c,
           options: {
-            color: j === 0 ? TERRA : ESPRESSO,
+            color: j === 0 ? BRAND : NAVY,
             bold: j === 0,
-            fill: { color: i % 2 === 0 ? WHITE : SAND },
+            fill: { color: i % 2 === 0 ? WHITE : TINT },
           },
         }))
       ),
@@ -255,21 +345,22 @@ function table(s, head, rows, colW, y, rowH, fontSize) {
 // ── 01 封面 ────────────────────────────────────────────────
 {
   const s = darkSlide();
+  placeLogo(s, M, 0.72, 0.8, true);
   s.addText("勞動部勞動力發展署　115 年度", {
     x: M,
-    y: 1.7,
+    y: 1.95,
     w: 10,
     h: 0.35,
     fontFace: BODY,
     fontSize: 14,
     bold: true,
-    color: SAGE,
+    color: GOLD,
     charSpacing: 2,
     margin: 0,
   });
   s.addText("企業人力資源\n提升計畫", {
     x: M,
-    y: 2.2,
+    y: 2.42,
     w: 9,
     h: 2.1,
     fontFace: HEAD,
@@ -286,7 +377,7 @@ function table(s, head, rows, colW, y, rowH, fontSize) {
     h: 0.4,
     fontFace: BODY,
     fontSize: 15,
-    color: "C9C1B8",
+    color: "C2CDE4",
     margin: 0,
   });
   s.addShape(pres.ShapeType.line, {
@@ -294,7 +385,7 @@ function table(s, head, rows, colW, y, rowH, fontSize) {
     y: 5.3,
     w: 2.2,
     h: 0,
-    line: { color: TERRA, width: 2 },
+    line: { color: GOLD, width: 2 },
   });
   s.addText("知育行銷有限公司　ZHIYU MARKETING", {
     x: M,
@@ -307,14 +398,26 @@ function table(s, head, rows, colW, y, rowH, fontSize) {
     color: WHITE,
     margin: 0,
   });
-  s.addText("2026 年 8 月", {
+  s.addText("以知啟行　以育成長", {
     x: M,
     y: 5.9,
     w: 7,
     h: 0.32,
+    fontFace: HEAD,
+    fontSize: 13,
+    color: GOLD,
+    charSpacing: 2,
+    margin: 0,
+  });
+  s.addText("2026 年 8 月", {
+    x: W - M - 3,
+    y: 5.9,
+    w: 3,
+    h: 0.32,
+    align: "right",
     fontFace: BODY,
     fontSize: 12,
-    color: MUTED,
+    color: "8C97AD",
     margin: 0,
   });
   s.addNotes(
@@ -333,8 +436,8 @@ function table(s, head, rows, colW, y, rowH, fontSize) {
   ];
   secs.forEach((it, i) => {
     const y = 2.0 + i * 1.12;
-    card(s, M, y, INNER, 0.95, i % 2 === 0 ? SAND : WHITE);
-    numCircle(s, M + 0.35, y + 0.25, i + 1, 0.46, i % 2 === 0 ? TERRA : SAGE, WHITE);
+    card(s, M, y, INNER, 0.95, i % 2 === 0 ? TINT : WHITE);
+    numCircle(s, M + 0.35, y + 0.25, i + 1, 0.46, i % 2 === 0 ? BRAND : GOLD, WHITE);
     s.addText(it.t, {
       x: M + 1.05,
       y: y,
@@ -344,7 +447,7 @@ function table(s, head, rows, colW, y, rowH, fontSize) {
       fontFace: HEAD,
       fontSize: 21,
       bold: true,
-      color: ESPRESSO,
+      color: NAVY,
       margin: 0,
     });
     s.addText(it.d, {
@@ -375,7 +478,7 @@ divider(1, "PART 01", "計劃說明", "計畫怎麼運作、補助多少、什�
     "企業人力資源提升計畫是什麼",
     "由勞動部勞動力發展署辦理，補助事業單位辦理在職員工訓練的部分訓練費用。"
   );
-  card(s, M, 2.0, INNER, 1.55, SAND);
+  card(s, M, 2.0, INNER, 1.55, TINT);
   s.addText("計畫目的", {
     x: M + 0.45,
     y: 2.22,
@@ -384,7 +487,7 @@ divider(1, "PART 01", "計劃說明", "計畫怎麼運作、補助多少、什�
     fontFace: HEAD,
     fontSize: 19,
     bold: true,
-    color: TERRA,
+    color: BRAND,
     margin: 0,
   });
   s.addText(
@@ -396,7 +499,7 @@ divider(1, "PART 01", "計劃說明", "計畫怎麼運作、補助多少、什�
       h: 0.75,
       fontFace: BODY,
       fontSize: 14,
-      color: ESPRESSO,
+      color: NAVY,
       lineSpacingMultiple: 1.25,
       margin: 0,
     }
@@ -417,7 +520,7 @@ divider(1, "PART 01", "計劃說明", "計畫怎麼運作、補助多少、什�
       fontFace: HEAD,
       fontSize: 18,
       bold: true,
-      color: ESPRESSO,
+      color: NAVY,
       margin: 0,
     });
     s.addText(it.d, {
@@ -465,7 +568,7 @@ divider(1, "PART 01", "計劃說明", "計畫怎麼運作、補助多少、什�
   ];
   threeCards(s, 0, 0, types, (it, i, x, cw) => {
     card(s, x, 2.0, cw, 3.5, WHITE);
-    numCircle(s, x + 0.35, 2.28, i + 1, 0.4, i === 1 ? TERRA : SAGE, WHITE);
+    numCircle(s, x + 0.35, 2.28, i + 1, 0.4, i === 1 ? BRAND : GOLD, WHITE);
     s.addText(it.t, {
       x: x + 0.85,
       y: 2.28,
@@ -475,12 +578,12 @@ divider(1, "PART 01", "計劃說明", "計畫怎麼運作、補助多少、什�
       fontFace: HEAD,
       fontSize: 20,
       bold: true,
-      color: ESPRESSO,
+      color: NAVY,
       margin: 0,
     });
     s.addText([
       { text: "最高補助　", options: { fontSize: 13, color: MUTED, fontFace: BODY } },
-      { text: it.n, options: { fontSize: 26, bold: true, color: TERRA, fontFace: HEAD } },
+      { text: it.n, options: { fontSize: 26, bold: true, color: BRAND, fontFace: HEAD } },
     ], { x: x + 0.35, y: 2.85, w: cw - 0.7, h: 0.55, margin: 0 });
     s.addText(it.d, {
       x: x + 0.35,
@@ -489,7 +592,7 @@ divider(1, "PART 01", "計劃說明", "計畫怎麼運作、補助多少、什�
       h: 1.15,
       fontFace: BODY,
       fontSize: 12.5,
-      color: ESPRESSO,
+      color: NAVY,
       lineSpacingMultiple: 1.2,
       margin: 0,
     });
@@ -517,7 +620,7 @@ divider(1, "PART 01", "計劃說明", "計畫怎麼運作、補助多少、什�
     "誰可以申請",
     "以就業保險投保人數為主要門檻，未達門檻者另有四條替代條件。"
   );
-  card(s, M, 2.0, 5.5, 1.85, SAND);
+  card(s, M, 2.0, 5.5, 1.85, TINT);
   s.addText("基本身分", {
     x: M + 0.4,
     y: 2.22,
@@ -526,7 +629,7 @@ divider(1, "PART 01", "計劃說明", "計畫怎麼運作、補助多少、什�
     fontFace: HEAD,
     fontSize: 18,
     bold: true,
-    color: TERRA,
+    color: BRAND,
     margin: 0,
   });
   bullets(
@@ -535,7 +638,7 @@ divider(1, "PART 01", "計劃說明", "計畫怎麼運作、補助多少、什�
     { x: M + 0.4, y: 2.65, w: 4.7, h: 0.85, fontSize: 13.5 }
   );
 
-  card(s, M + 5.8, 2.0, 6.1, 1.85, ESPRESSO);
+  card(s, M + 5.8, 2.0, 6.1, 1.85, NAVY);
   s.addText("人數門檻", {
     x: M + 6.2,
     y: 2.22,
@@ -544,11 +647,11 @@ divider(1, "PART 01", "計劃說明", "計畫怎麼運作、補助多少、什�
     fontFace: HEAD,
     fontSize: 18,
     bold: true,
-    color: SAGE,
+    color: GOLD,
     margin: 0,
   });
   s.addText([
-    { text: "受僱勞工參加就業保險人數　", options: { fontSize: 13.5, color: "C9C1B8" } },
+    { text: "受僱勞工參加就業保險人數　", options: { fontSize: 13.5, color: "C2CDE4" } },
     { text: "51 人（含）以上", options: { fontSize: 20, bold: true, color: WHITE, fontFace: HEAD } },
   ], {
     x: M + 6.2,
@@ -569,7 +672,7 @@ divider(1, "PART 01", "計劃說明", "計畫怎麼運作、補助多少、什�
     fontFace: HEAD,
     fontSize: 17,
     bold: true,
-    color: ESPRESSO,
+    color: NAVY,
     margin: 0,
   });
   const alts = [
@@ -583,7 +686,7 @@ divider(1, "PART 01", "計劃說明", "計畫怎麼運作、補助多少、什�
     const row = Math.floor(i / 2);
     const x = M + 0.4 + col * 5.6;
     const y = 4.72 + row * 0.62;
-    numCircle(s, x, y, i + 1, 0.32, SAGE, WHITE);
+    numCircle(s, x, y, i + 1, 0.32, GOLD, WHITE);
     s.addText(t, {
       x: x + 0.45,
       y: y - 0.06,
@@ -592,7 +695,7 @@ divider(1, "PART 01", "計劃說明", "計畫怎麼運作、補助多少、什�
       valign: "middle",
       fontFace: BODY,
       fontSize: 12,
-      color: ESPRESSO,
+      color: NAVY,
       lineSpacingMultiple: 1.1,
       margin: 0,
     });
@@ -616,7 +719,7 @@ divider(1, "PART 01", "計劃說明", "計畫怎麼運作、補助多少、什�
     fontFace: HEAD,
     fontSize: 18,
     bold: true,
-    color: ESPRESSO,
+    color: NAVY,
     margin: 0,
   });
   s.addChart(
@@ -635,20 +738,20 @@ divider(1, "PART 01", "計劃說明", "計畫怎麼運作、補助多少、什�
       h: 1.95,
       barDir: "col",
       barGapWidthPct: 120,
-      chartColors: [SAGE, TERRA],
+      chartColors: [GOLD, BRAND],
       varyColors: true,
       showLegend: false,
       showTitle: false,
       showValue: true,
       dataLabelPosition: "outEnd",
       dataLabelFormatCode: '0"%"',
-      dataLabelColor: ESPRESSO,
+      dataLabelColor: NAVY,
       dataLabelFontFace: BODY,
       dataLabelFontSize: 14,
       dataLabelFontBold: true,
       valAxisMaxVal: 100,
       valAxisHidden: true,
-      catAxisLabelColor: ESPRESSO,
+      catAxisLabelColor: NAVY,
       catAxisLabelFontFace: BODY,
       catAxisLabelFontSize: 12,
       catGridLine: { style: "none" },
@@ -667,7 +770,7 @@ divider(1, "PART 01", "計劃說明", "計畫怎麼運作、補助多少、什�
     margin: 0,
   });
 
-  card(s, M + 5.8, 2.0, 6.1, 3.5, SAND);
+  card(s, M + 5.8, 2.0, 6.1, 3.5, TINT);
   s.addText("可申請補助的費用項目", {
     x: M + 6.2,
     y: 2.22,
@@ -676,7 +779,7 @@ divider(1, "PART 01", "計劃說明", "計畫怎麼運作、補助多少、什�
     fontFace: HEAD,
     fontSize: 18,
     bold: true,
-    color: TERRA,
+    color: BRAND,
     margin: 0,
   });
   bullets(
@@ -723,7 +826,7 @@ divider(1, "PART 01", "計劃說明", "計畫怎麼運作、補助多少、什�
     },
   ];
   threeCards(s, 0, 0, kinds, (it, i, x, cw) => {
-    card(s, x, 2.0, cw, 1.95, i === 0 ? SAND : WHITE);
+    card(s, x, 2.0, cw, 1.95, i === 0 ? TINT : WHITE);
     s.addText(it.t, {
       x: x + 0.35,
       y: 2.2,
@@ -732,7 +835,7 @@ divider(1, "PART 01", "計劃說明", "計畫怎麼運作、補助多少、什�
       fontFace: HEAD,
       fontSize: 18,
       bold: true,
-      color: ESPRESSO,
+      color: NAVY,
       margin: 0,
     });
     s.addText(it.d, {
@@ -754,7 +857,7 @@ divider(1, "PART 01", "計劃說明", "計畫怎麼運作、補助多少、什�
       fontFace: BODY,
       fontSize: 12,
       bold: true,
-      color: TERRA,
+      color: BRAND,
       margin: 0,
     });
   });
@@ -768,7 +871,7 @@ divider(1, "PART 01", "計劃說明", "計畫怎麼運作、補助多少、什�
     fontFace: HEAD,
     fontSize: 16,
     bold: true,
-    color: ESPRESSO,
+    color: NAVY,
     margin: 0,
   });
   const cats = [
@@ -795,7 +898,7 @@ divider(1, "PART 01", "計劃說明", "計畫怎麼運作、補助多少、什�
       h: 0.28,
       fontFace: BODY,
       fontSize: 11.5,
-      color: ESPRESSO,
+      color: NAVY,
       margin: 0,
     });
   });
@@ -823,9 +926,9 @@ divider(1, "PART 01", "計劃說明", "計畫怎麼運作、補助多少、什�
   const cw = (INNER - 0.84) / 4;
   specs.forEach((it, i) => {
     const x = M + i * (cw + 0.28);
-    card(s, x, 2.1, cw, 2.35, i % 2 === 0 ? SAND : WHITE);
+    card(s, x, 2.1, cw, 2.35, i % 2 === 0 ? TINT : WHITE);
     s.addText([
-      { text: it.n, options: { fontSize: 30, bold: true, color: TERRA, fontFace: HEAD } },
+      { text: it.n, options: { fontSize: 30, bold: true, color: BRAND, fontFace: HEAD } },
       { text: " " + it.u, options: { fontSize: 13, color: MUTED, fontFace: BODY } },
     ], { x: x + 0.3, y: 2.35, w: cw - 0.6, h: 0.62, margin: 0 });
     s.addText(it.t, {
@@ -836,7 +939,7 @@ divider(1, "PART 01", "計劃說明", "計畫怎麼運作、補助多少、什�
       fontFace: BODY,
       fontSize: 14,
       bold: true,
-      color: ESPRESSO,
+      color: NAVY,
       lineSpacingMultiple: 1.1,
       margin: 0,
     });
@@ -853,7 +956,7 @@ divider(1, "PART 01", "計劃說明", "計畫怎麼運作、補助多少、什�
     });
   });
 
-  card(s, M, 4.75, INNER, 1.15, ESPRESSO);
+  card(s, M, 4.75, INNER, 1.15, NAVY);
   s.addText("排課時一併確認的欄位", {
     x: M + 0.45,
     y: 4.95,
@@ -862,7 +965,7 @@ divider(1, "PART 01", "計劃說明", "計畫怎麼運作、補助多少、什�
     fontFace: HEAD,
     fontSize: 15,
     bold: true,
-    color: SAGE,
+    color: GOLD,
     margin: 0,
   });
   s.addText(
@@ -874,7 +977,7 @@ divider(1, "PART 01", "計劃說明", "計畫怎麼運作、補助多少、什�
       h: 0.45,
       fontFace: BODY,
       fontSize: 12.5,
-      color: "E5E0D8",
+      color: "DCE5F4",
       lineSpacingMultiple: 1.15,
       margin: 0,
     }
@@ -901,8 +1004,8 @@ divider(1, "PART 01", "計劃說明", "計畫怎麼運作、補助多少、什�
   const gap = 0.16;
   steps.forEach((it, i) => {
     const x = M + i * (cw + gap);
-    card(s, x, 2.3, cw, 2.55, i % 2 === 0 ? SAND : WHITE);
-    numCircle(s, x + cw / 2 - 0.22, 2.58, i + 1, 0.44, i % 2 === 0 ? TERRA : SAGE, WHITE);
+    card(s, x, 2.3, cw, 2.55, i % 2 === 0 ? TINT : WHITE);
+    numCircle(s, x + cw / 2 - 0.22, 2.58, i + 1, 0.44, i % 2 === 0 ? BRAND : GOLD, WHITE);
     s.addText(it.t, {
       x: x + 0.15,
       y: 3.12,
@@ -912,7 +1015,7 @@ divider(1, "PART 01", "計劃說明", "計畫怎麼運作、補助多少、什�
       fontFace: HEAD,
       fontSize: 16,
       bold: true,
-      color: ESPRESSO,
+      color: NAVY,
       margin: 0,
     });
     s.addText(it.d, {
@@ -936,7 +1039,7 @@ divider(1, "PART 01", "計劃說明", "計畫怎麼運作、補助多少、什�
       fontFace: BODY,
       fontSize: 11.5,
       bold: true,
-      color: TERRA,
+      color: BRAND,
       margin: 0,
     });
     if (i < steps.length - 1) {
@@ -958,7 +1061,7 @@ divider(1, "PART 01", "計劃說明", "計畫怎麼運作、補助多少、什�
       h: 0.45,
       fontFace: BODY,
       fontSize: 13.5,
-      color: ESPRESSO,
+      color: NAVY,
       margin: 0,
     }
   );
@@ -981,7 +1084,7 @@ divider(2, "PART 02", "協助規劃範疇", "從資格確認、需求盤點、�
   const phases = [
     {
       t: "申請前",
-      c: TERRA,
+      c: BRAND,
       items: [
         "投保人數與資格條件確認",
         "訓練需求訪談與職能盤點",
@@ -992,7 +1095,7 @@ divider(2, "PART 02", "協助規劃範疇", "從資格確認、需求盤點、�
     },
     {
       t: "執行中",
-      c: SAGE,
+      c: GOLD,
       items: [
         "開訓報備文件與學員名冊",
         "講師安排與教材講義製作",
@@ -1003,7 +1106,7 @@ divider(2, "PART 02", "協助規劃範疇", "從資格確認、需求盤點、�
     },
     {
       t: "結案後",
-      c: ESPRESSO,
+      c: NAVY,
       items: [
         "核銷單據編製與檢核",
         "學員滿意度調查與彙整",
@@ -1015,14 +1118,14 @@ divider(2, "PART 02", "協助規劃範疇", "從資格確認、需求盤點、�
   ];
   threeCards(s, 0, 0, phases, (it, i, x, cw) => {
     const dark = i === 2;
-    card(s, x, 2.0, cw, 3.75, dark ? ESPRESSO : i === 0 ? SAND : WHITE);
+    card(s, x, 2.0, cw, 3.75, dark ? NAVY : i === 0 ? TINT : WHITE);
     s.addShape(pres.ShapeType.ellipse, {
       x: x + 0.35,
       y: 2.28,
       w: 0.42,
       h: 0.42,
-      fill: { color: dark ? TERRA : it.c },
-      line: { color: dark ? TERRA : it.c, width: 1 },
+      fill: { color: dark ? GOLD : it.c },
+      line: { color: dark ? BRAND : it.c, width: 1 },
     });
     s.addText(String(i + 1), {
       x: x + 0.35,
@@ -1046,7 +1149,7 @@ divider(2, "PART 02", "協助規劃範疇", "從資格確認、需求盤點、�
       fontFace: HEAD,
       fontSize: 21,
       bold: true,
-      color: dark ? WHITE : ESPRESSO,
+      color: dark ? WHITE : NAVY,
       margin: 0,
     });
     bullets(s, it.items, {
@@ -1055,7 +1158,7 @@ divider(2, "PART 02", "協助規劃範疇", "從資格確認、需求盤點、�
       w: cw - 0.7,
       h: 2.65,
       fontSize: 13,
-      color: dark ? "E5E0D8" : ESPRESSO,
+      color: dark ? "DCE5F4" : NAVY,
       paraSpaceAfter: 9,
     });
   });
@@ -1091,8 +1194,8 @@ divider(2, "PART 02", "協助規劃範疇", "從資格確認、需求盤點、�
   const cw = (INNER - 0.84) / 4;
   steps.forEach((it, i) => {
     const x = M + i * (cw + 0.28);
-    card(s, x, 2.15, cw, 2.7, i % 2 === 0 ? SAND : WHITE);
-    numCircle(s, x + 0.32, 2.45, i + 1, 0.42, i % 2 === 0 ? TERRA : SAGE, WHITE);
+    card(s, x, 2.15, cw, 2.7, i % 2 === 0 ? TINT : WHITE);
+    numCircle(s, x + 0.32, 2.45, i + 1, 0.42, i % 2 === 0 ? BRAND : GOLD, WHITE);
     s.addText(it.t, {
       x: x + 0.32,
       y: 3.0,
@@ -1101,7 +1204,7 @@ divider(2, "PART 02", "協助規劃範疇", "從資格確認、需求盤點、�
       fontFace: HEAD,
       fontSize: 18,
       bold: true,
-      color: ESPRESSO,
+      color: NAVY,
       margin: 0,
     });
     s.addText(it.d, {
@@ -1125,7 +1228,7 @@ divider(2, "PART 02", "協助規劃範疇", "從資格確認、需求盤點、�
       });
     }
   });
-  card(s, M, 5.15, INNER, 0.95, ESPRESSO);
+  card(s, M, 5.15, INNER, 0.95, NAVY);
   s.addText(
     "審查看的是「訓練需求分析 → 課程設計 → 績效指標」的完整邏輯，一份課程清單並不構成訓練計畫書。",
     {
@@ -1161,8 +1264,8 @@ divider(2, "PART 02", "協助規劃範疇", "從資格確認、需求盤點、�
   const gap = 0.28;
   flow.forEach((it, i) => {
     const x = M + i * (cw + gap);
-    card(s, x, 2.15, cw, 2.75, i % 2 === 0 ? SAND : WHITE);
-    numCircle(s, x + 0.32, 2.42, i + 1, 0.42, i % 2 === 0 ? TERRA : SAGE, WHITE);
+    card(s, x, 2.15, cw, 2.75, i % 2 === 0 ? TINT : WHITE);
+    numCircle(s, x + 0.32, 2.42, i + 1, 0.42, i % 2 === 0 ? BRAND : GOLD, WHITE);
     s.addText(it.t, {
       x: x + 0.32,
       y: 2.98,
@@ -1171,7 +1274,7 @@ divider(2, "PART 02", "協助規劃範疇", "從資格確認、需求盤點、�
       fontFace: HEAD,
       fontSize: 19,
       bold: true,
-      color: ESPRESSO,
+      color: NAVY,
       margin: 0,
     });
     s.addText(it.d, {
@@ -1193,7 +1296,7 @@ divider(2, "PART 02", "協助規劃範疇", "從資格確認、需求盤點、�
       fontFace: BODY,
       fontSize: 12,
       bold: true,
-      color: TERRA,
+      color: BRAND,
       margin: 0,
     });
     if (i < flow.length - 1) {
@@ -1215,7 +1318,7 @@ divider(2, "PART 02", "協助規劃範疇", "從資格確認、需求盤點、�
       h: 0.45,
       fontFace: BODY,
       fontSize: 13.5,
-      color: ESPRESSO,
+      color: NAVY,
       margin: 0,
     }
   );
@@ -1306,8 +1409,8 @@ divider(3, "PART 03", "服務內容", "四大模組、課程執行方式、交�
   const cw = (INNER - 0.84) / 4;
   mods.forEach((m, i) => {
     const x = M + i * (cw + 0.28);
-    card(s, x, 2.0, cw, 3.85, i % 2 === 0 ? SAND : WHITE);
-    numCircle(s, x + 0.32, 2.28, i + 1, 0.42, i % 2 === 0 ? TERRA : SAGE, WHITE);
+    card(s, x, 2.0, cw, 3.85, i % 2 === 0 ? TINT : WHITE);
+    numCircle(s, x + 0.32, 2.28, i + 1, 0.42, i % 2 === 0 ? BRAND : GOLD, WHITE);
     s.addText(m.t, {
       x: x + 0.32,
       y: 2.82,
@@ -1316,7 +1419,7 @@ divider(3, "PART 03", "服務內容", "四大模組、課程執行方式、交�
       fontFace: HEAD,
       fontSize: 18,
       bold: true,
-      color: ESPRESSO,
+      color: NAVY,
       lineSpacingMultiple: 1.05,
       margin: 0,
     });
@@ -1340,7 +1443,7 @@ divider(3, "PART 03", "服務內容", "四大模組、課程執行方式、交�
     "課程怎麼上",
     "學科講授搭配術科實作，課堂上直接產出可用的成品。"
   );
-  card(s, M, 2.0, 5.8, 3.9, SAND);
+  card(s, M, 2.0, 5.8, 3.9, TINT);
   s.addText("現場配置", {
     x: M + 0.4,
     y: 2.22,
@@ -1349,7 +1452,7 @@ divider(3, "PART 03", "服務內容", "四大模組、課程執行方式、交�
     fontFace: HEAD,
     fontSize: 19,
     bold: true,
-    color: TERRA,
+    color: BRAND,
     margin: 0,
   });
   bullets(
@@ -1373,7 +1476,7 @@ divider(3, "PART 03", "服務內容", "四大模組、課程執行方式、交�
     fontFace: HEAD,
     fontSize: 19,
     bold: true,
-    color: ESPRESSO,
+    color: NAVY,
     margin: 0,
   });
   s.addText(
@@ -1393,7 +1496,7 @@ divider(3, "PART 03", "服務內容", "四大模組、課程執行方式、交�
   const sde = ["腳本", "素材拍攝", "後製剪輯", "上架發布"];
   sde.forEach((t, i) => {
     const y = 3.42 + i * 0.55;
-    numCircle(s, M + 6.5, y, i + 1, 0.36, i === 3 ? TERRA : SAGE, WHITE);
+    numCircle(s, M + 6.5, y, i + 1, 0.36, i === 3 ? BRAND : GOLD, WHITE);
     s.addText(t, {
       x: M + 7.0,
       y: y - 0.03,
@@ -1403,7 +1506,7 @@ divider(3, "PART 03", "服務內容", "四大模組、課程執行方式、交�
       fontFace: BODY,
       fontSize: 14,
       bold: true,
-      color: ESPRESSO,
+      color: NAVY,
       margin: 0,
     });
   });
@@ -1482,7 +1585,7 @@ divider(3, "PART 03", "服務內容", "四大模組、課程執行方式、交�
   ];
   threeCards(s, 0, 0, plans, (p, i, x, cw) => {
     const hi = i === 2;
-    card(s, x, 2.0, cw, 3.65, hi ? ESPRESSO : WHITE);
+    card(s, x, 2.0, cw, 3.65, hi ? NAVY : WHITE);
     s.addText(p.t, {
       x: x + 0.35,
       y: 2.25,
@@ -1491,7 +1594,7 @@ divider(3, "PART 03", "服務內容", "四大模組、課程執行方式、交�
       fontFace: HEAD,
       fontSize: 22,
       bold: true,
-      color: hi ? WHITE : ESPRESSO,
+      color: hi ? WHITE : NAVY,
       margin: 0,
     });
     s.addText(p.h, {
@@ -1502,7 +1605,7 @@ divider(3, "PART 03", "服務內容", "四大模組、課程執行方式、交�
       fontFace: HEAD,
       fontSize: 25,
       bold: true,
-      color: hi ? SAGE : TERRA,
+      color: hi ? GOLD : BRAND,
       margin: 0,
     });
     bullets(s, p.f, {
@@ -1511,18 +1614,18 @@ divider(3, "PART 03", "服務內容", "四大模組、課程執行方式、交�
       w: cw - 0.7,
       h: 1.35,
       fontSize: 12.5,
-      color: hi ? "E5E0D8" : ESPRESSO,
+      color: hi ? "DCE5F4" : NAVY,
     });
     s.addShape(pres.ShapeType.line, {
       x: x + 0.35,
       y: 4.8,
       w: cw - 0.7,
       h: 0,
-      line: { color: hi ? "5A534C" : LINE, width: 1 },
+      line: { color: hi ? "2E4A85" : LINE, width: 1 },
     });
     s.addText([
-      { text: "預期產出　", options: { bold: true, color: hi ? SAGE : TERRA } },
-      { text: p.out, options: { color: hi ? "E5E0D8" : MUTED } },
+      { text: "預期產出　", options: { bold: true, color: hi ? GOLD : BRAND } },
+      { text: p.out, options: { color: hi ? "DCE5F4" : MUTED } },
     ], {
       x: x + 0.35,
       y: 4.93,
@@ -1562,11 +1665,11 @@ divider(4, "PART 04", "企業輔導實例", "實際規劃過的課程結構、�
   const scw = (INNER - 0.56) / 3;
   stats.forEach((it, i) => {
     const x = M + i * (scw + 0.28);
-    card(s, x, 1.95, scw, 1.15, i === 1 ? ESPRESSO : SAND);
+    card(s, x, 1.95, scw, 1.15, i === 1 ? NAVY : TINT);
     const dark = i === 1;
     s.addText([
-      { text: it.n, options: { fontSize: 30, bold: true, color: dark ? WHITE : TERRA, fontFace: HEAD } },
-      { text: " " + it.u, options: { fontSize: 13, color: dark ? "C9C1B8" : MUTED, fontFace: BODY } },
+      { text: it.n, options: { fontSize: 30, bold: true, color: dark ? WHITE : BRAND, fontFace: HEAD } },
+      { text: " " + it.u, options: { fontSize: 13, color: dark ? "C2CDE4" : MUTED, fontFace: BODY } },
     ], { x: x + 0.35, y: 2.1, w: scw - 0.7, h: 0.55, margin: 0 });
     s.addText(it.d, {
       x: x + 0.35,
@@ -1575,7 +1678,7 @@ divider(4, "PART 04", "企業輔導實例", "實際規劃過的課程結構、�
       h: 0.32,
       fontFace: BODY,
       fontSize: 11.5,
-      color: dark ? "C9C1B8" : MUTED,
+      color: dark ? "C2CDE4" : MUTED,
       margin: 0,
     });
   });
@@ -1588,7 +1691,7 @@ divider(4, "PART 04", "企業輔導實例", "實際規劃過的課程結構、�
     fontFace: HEAD,
     fontSize: 16,
     bold: true,
-    color: ESPRESSO,
+    color: NAVY,
     margin: 0,
   });
   const courses = [
@@ -1610,7 +1713,7 @@ divider(4, "PART 04", "企業輔導實例", "實際規劃過的課程結構、�
     const row = Math.floor(i / 3);
     const x = M + col * (scw + 0.28);
     const y = 3.72 + row * 0.58;
-    card(s, x, y, scw, 0.48, row % 2 === 0 ? WHITE : SAND);
+    card(s, x, y, scw, 0.48, row % 2 === 0 ? WHITE : TINT);
     s.addText(c[0], {
       x: x + 0.22,
       y: y,
@@ -1619,7 +1722,7 @@ divider(4, "PART 04", "企業輔導實例", "實際規劃過的課程結構、�
       valign: "middle",
       fontFace: BODY,
       fontSize: 11.5,
-      color: ESPRESSO,
+      color: NAVY,
       margin: 0,
     });
     s.addText(c[1], {
@@ -1632,7 +1735,7 @@ divider(4, "PART 04", "企業輔導實例", "實際規劃過的課程結構、�
       fontFace: BODY,
       fontSize: 11.5,
       bold: true,
-      color: TERRA,
+      color: BRAND,
       margin: 0,
     });
   });
@@ -1669,26 +1772,26 @@ divider(4, "PART 04", "企業輔導實例", "實際規劃過的課程結構、�
       h: 3.9,
       barDir: "bar",
       barGapWidthPct: 60,
-      chartColors: [TERRA],
+      chartColors: [BRAND],
       showLegend: false,
       showTitle: false,
       showValue: true,
       dataLabelPosition: "outEnd",
       dataLabelFormatCode: '0" 小時"',
-      dataLabelColor: ESPRESSO,
+      dataLabelColor: NAVY,
       dataLabelFontFace: BODY,
       dataLabelFontSize: 12,
       dataLabelFontBold: true,
       valAxisMaxVal: 160,
       valAxisHidden: true,
-      catAxisLabelColor: ESPRESSO,
+      catAxisLabelColor: NAVY,
       catAxisLabelFontFace: BODY,
       catAxisLabelFontSize: 12.5,
       catGridLine: { style: "none" },
       valGridLine: { style: "none" },
     }
   );
-  card(s, M + 8.0, 2.0, 3.9, 3.9, SAND);
+  card(s, M + 8.0, 2.0, 3.9, 3.9, TINT);
   s.addText("配置邏輯", {
     x: M + 8.35,
     y: 2.25,
@@ -1697,7 +1800,7 @@ divider(4, "PART 04", "企業輔導實例", "實際規劃過的課程結構、�
     fontFace: HEAD,
     fontSize: 18,
     bold: true,
-    color: TERRA,
+    color: BRAND,
     margin: 0,
   });
   bullets(
@@ -1720,7 +1823,7 @@ divider(4, "PART 04", "企業輔導實例", "實際規劃過的課程結構、�
     "其他輔導與服務企業",
     "跨食品製造、農產、餐飲、旅宿、教育與服務業，涵蓋計畫申請、課程執行與行銷代理。"
   );
-  card(s, M, 2.0, 5.8, 3.3, SAND);
+  card(s, M, 2.0, 5.8, 3.3, TINT);
   s.addText("計畫申請與課程執行", {
     x: M + 0.4,
     y: 2.22,
@@ -1729,7 +1832,7 @@ divider(4, "PART 04", "企業輔導實例", "實際規劃過的課程結構、�
     fontFace: HEAD,
     fontSize: 19,
     bold: true,
-    color: TERRA,
+    color: BRAND,
     margin: 0,
   });
   bullets(
@@ -1753,7 +1856,7 @@ divider(4, "PART 04", "企業輔導實例", "實際規劃過的課程結構、�
     fontFace: HEAD,
     fontSize: 19,
     bold: true,
-    color: ESPRESSO,
+    color: NAVY,
     margin: 0,
   });
   bullets(
@@ -1778,8 +1881,8 @@ divider(4, "PART 04", "企業輔導實例", "實際規劃過的課程結構、�
       w: iw,
       h: 0.55,
       rectRadius: 0.1,
-      fill: { color: ESPRESSO },
-      line: { color: ESPRESSO, width: 1 },
+      fill: { color: NAVY },
+      line: { color: NAVY, width: 1 },
     });
     s.addText(t, {
       x,
@@ -1802,6 +1905,7 @@ divider(4, "PART 04", "企業輔導實例", "實際規劃過的課程結構、�
 // ── 25 聯絡 ────────────────────────────────────────────────
 {
   const s = darkSlide();
+  placeLogoRight(s, W - M, 0.6, 0.55, true);
   s.addText("CONTACT", {
     x: M,
     y: 1.55,
@@ -1810,7 +1914,7 @@ divider(4, "PART 04", "企業輔導實例", "實際規劃過的課程結構、�
     fontFace: BODY,
     fontSize: 12,
     bold: true,
-    color: SAGE,
+    color: GOLD,
     charSpacing: 2,
     margin: 0,
   });
@@ -1834,7 +1938,7 @@ divider(4, "PART 04", "企業輔導實例", "實際規劃過的課程結構、�
       h: 0.75,
       fontFace: BODY,
       fontSize: 15,
-      color: "C9C1B8",
+      color: "C2CDE4",
       lineSpacingMultiple: 1.3,
       margin: 0,
     }
@@ -1845,8 +1949,8 @@ divider(4, "PART 04", "企業輔導實例", "實際規劃過的課程結構、�
     w: 5.8,
     h: 1.85,
     rectRadius: 0.08,
-    fill: { color: "3A352F" },
-    line: { color: "4A443D", width: 1 },
+    fill: { color: "1E3566" },
+    line: { color: "2E4A85", width: 1 },
   });
   s.addText("黃皇賓　BEN HUANG", {
     x: M + 0.45,
@@ -1866,7 +1970,7 @@ divider(4, "PART 04", "企業輔導實例", "實際規劃過的課程結構、�
     h: 0.32,
     fontFace: BODY,
     fontSize: 13,
-    color: SAGE,
+    color: GOLD,
     margin: 0,
   });
   s.addText("電話　0983-339-790\nEmail　zhiyumkt@gmail.com", {
@@ -1876,7 +1980,7 @@ divider(4, "PART 04", "企業輔導實例", "實際規劃過的課程結構、�
     h: 0.7,
     fontFace: BODY,
     fontSize: 13,
-    color: "C9C1B8",
+    color: "C2CDE4",
     lineSpacingMultiple: 1.3,
     margin: 0,
   });
@@ -1887,8 +1991,8 @@ divider(4, "PART 04", "企業輔導實例", "實際規劃過的課程結構、�
     w: 5.8,
     h: 1.85,
     rectRadius: 0.08,
-    fill: { color: "3A352F" },
-    line: { color: "4A443D", width: 1 },
+    fill: { color: "1E3566" },
+    line: { color: "2E4A85", width: 1 },
   });
   s.addText("服務區域", {
     x: M + 6.55,
@@ -1910,7 +2014,7 @@ divider(4, "PART 04", "企業輔導實例", "實際規劃過的課程結構、�
       h: 1.0,
       fontFace: BODY,
       fontSize: 13,
-      color: "C9C1B8",
+      color: "C2CDE4",
       lineSpacingMultiple: 1.3,
       margin: 0,
     }
