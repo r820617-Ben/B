@@ -1,0 +1,35 @@
+{
+  "type": "flex",
+  "altText": "你上次的診斷做到一半",
+  "contents": {
+    "type": "bubble",
+    "size": "kilo",
+    "styles": { "body": { "backgroundColor": "#0E1116" }, "footer": { "backgroundColor": "#0E1116" } },
+    "body": {
+      "type": "box",
+      "layout": "vertical",
+      "paddingAll": "20px",
+      "contents": [
+        { "type": "text", "text": "你上次做到第 {{answered_count}} 題", "size": "md", "color": "#E8EAED", "weight": "bold", "wrap": true },
+        { "type": "text", "text": "剩下 {{remaining_count}} 題，大概 20 秒。", "size": "sm", "color": "#8A8F98", "margin": "sm", "wrap": true }
+      ]
+    },
+    "footer": {
+      "type": "box",
+      "layout": "vertical",
+      "paddingAll": "20px",
+      "paddingTop": "0px",
+      "spacing": "sm",
+      "contents": [
+        {
+          "type": "button", "style": "primary", "height": "sm", "color": "#C8A96A",
+          "action": { "type": "postback", "label": "接著做完", "data": "type=sys&v=resume", "displayText": "接著做完" }
+        },
+        {
+          "type": "button", "style": "secondary", "height": "sm", "color": "#1A1F26",
+          "action": { "type": "postback", "label": "重新開始", "data": "type=sys&v=restart", "displayText": "重新開始" }
+        }
+      ]
+    }
+  }
+}

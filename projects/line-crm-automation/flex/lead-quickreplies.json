@@ -1,0 +1,60 @@
+{
+  "LEAD3": {
+    "text": "主要做哪個產業？",
+    "quickReply": { "items": [
+      { "type": "action", "action": { "type": "postback", "label": "食品餐飲", "data": "type=lead&q=LEAD3&v=food", "displayText": "食品餐飲" } },
+      { "type": "action", "action": { "type": "postback", "label": "零售電商", "data": "type=lead&q=LEAD3&v=retail", "displayText": "零售電商" } },
+      { "type": "action", "action": { "type": "postback", "label": "製造業", "data": "type=lead&q=LEAD3&v=mfg", "displayText": "製造業" } },
+      { "type": "action", "action": { "type": "postback", "label": "服務業", "data": "type=lead&q=LEAD3&v=service", "displayText": "服務業" } },
+      { "type": "action", "action": { "type": "postback", "label": "教育訓練", "data": "type=lead&q=LEAD3&v=edu", "displayText": "教育訓練" } },
+      { "type": "action", "action": { "type": "postback", "label": "醫療健康", "data": "type=lead&q=LEAD3&v=medical", "displayText": "醫療健康" } },
+      { "type": "action", "action": { "type": "postback", "label": "B2B 專業服務", "data": "type=lead&q=LEAD3&v=b2b", "displayText": "B2B 專業服務" } },
+      { "type": "action", "action": { "type": "postback", "label": "其他", "data": "type=lead&q=LEAD3&v=other", "displayText": "其他" } }
+    ]}
+  },
+  "LEAD4": {
+    "text": "你在公司的角色？",
+    "quickReply": { "items": [
+      { "type": "action", "action": { "type": "postback", "label": "負責人 / 執行長", "data": "type=lead&q=LEAD4&v=owner", "displayText": "負責人" } },
+      { "type": "action", "action": { "type": "postback", "label": "副總 / 總監", "data": "type=lead&q=LEAD4&v=vp", "displayText": "副總／總監" } },
+      { "type": "action", "action": { "type": "postback", "label": "經理 / 主管", "data": "type=lead&q=LEAD4&v=manager", "displayText": "經理／主管" } },
+      { "type": "action", "action": { "type": "postback", "label": "專員 / 執行", "data": "type=lead&q=LEAD4&v=staff", "displayText": "專員" } }
+    ]}
+  },
+  "LEAD5": {
+    "text": "公司規模？",
+    "quickReply": { "items": [
+      { "type": "action", "action": { "type": "postback", "label": "1–5 人", "data": "type=lead&q=LEAD5&v=s1to5", "displayText": "1–5 人" } },
+      { "type": "action", "action": { "type": "postback", "label": "6–19 人", "data": "type=lead&q=LEAD5&v=s6to19", "displayText": "6–19 人" } },
+      { "type": "action", "action": { "type": "postback", "label": "20–49 人", "data": "type=lead&q=LEAD5&v=s20to49", "displayText": "20–49 人" } },
+      { "type": "action", "action": { "type": "postback", "label": "50 人以上", "data": "type=lead&q=LEAD5&v=s50plus", "displayText": "50 人以上" } }
+    ]}
+  },
+  "LEAD6": {
+    "text": "如果要開始，大概什麼時候？",
+    "quickReply": { "items": [
+      { "type": "action", "action": { "type": "postback", "label": "立即", "data": "type=lead&q=LEAD6&v=now", "displayText": "立即" } },
+      { "type": "action", "action": { "type": "postback", "label": "1–3 個月", "data": "type=lead&q=LEAD6&v=m1to3", "displayText": "1–3 個月" } },
+      { "type": "action", "action": { "type": "postback", "label": "3–6 個月", "data": "type=lead&q=LEAD6&v=m3to6", "displayText": "3–6 個月" } },
+      { "type": "action", "action": { "type": "postback", "label": "先了解看看", "data": "type=lead&q=LEAD6&v=exploring", "displayText": "先了解看看" } }
+    ]}
+  },
+  "LEAD7": {
+    "text": "這題只是讓顧問知道要提什麼方案，不是報價。不確定就選不確定。\n\n這件事目前的預算範圍？",
+    "quickReply": { "items": [
+      { "type": "action", "action": { "type": "postback", "label": "尚未確認", "data": "type=lead&q=LEAD7&v=unknown", "displayText": "尚未確認" } },
+      { "type": "action", "action": { "type": "postback", "label": "5 萬以下", "data": "type=lead&q=LEAD7&v=b_lt5", "displayText": "5 萬以下" } },
+      { "type": "action", "action": { "type": "postback", "label": "5–10 萬", "data": "type=lead&q=LEAD7&v=b5to10", "displayText": "5–10 萬" } },
+      { "type": "action", "action": { "type": "postback", "label": "10–30 萬", "data": "type=lead&q=LEAD7&v=b10to30", "displayText": "10–30 萬" } },
+      { "type": "action", "action": { "type": "postback", "label": "30 萬以上", "data": "type=lead&q=LEAD7&v=b30plus", "displayText": "30 萬以上" } }
+    ]}
+  },
+  "LEAD8": {
+    "text": "顧問聯繫你，用 LINE 就好還是留其他方式？",
+    "quickReply": { "items": [
+      { "type": "action", "action": { "type": "postback", "label": "LINE 就好", "data": "type=lead&q=LEAD8&v=line", "displayText": "LINE 就好" } },
+      { "type": "action", "action": { "type": "postback", "label": "我留 Email", "data": "type=lead&q=LEAD8&v=email", "displayText": "我留 Email" } },
+      { "type": "action", "action": { "type": "postback", "label": "留手機比較快", "data": "type=lead&q=LEAD8&v=phone", "displayText": "留手機比較快" } }
+    ]}
+  }
+}

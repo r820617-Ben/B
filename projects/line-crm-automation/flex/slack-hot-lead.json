@@ -1,0 +1,63 @@
+{
+  "text": "🔥 HOT LEAD｜{{company_name}}（Lead Score {{lead_score}}）",
+  "blocks": [
+    {
+      "type": "header",
+      "text": { "type": "plain_text", "text": "🔥 HOT LEAD｜{{company_name}}", "emoji": true }
+    },
+    {
+      "type": "section",
+      "fields": [
+        { "type": "mrkdwn", "text": "*聯絡人*\n{{name}}｜{{role_label}}" },
+        { "type": "mrkdwn", "text": "*產業／規模*\n{{industry_label}}｜{{size_label}}" },
+        { "type": "mrkdwn", "text": "*Lead Score*\n{{lead_score}} / 100" },
+        { "type": "mrkdwn", "text": "*AI Ready*\n{{ai_ready_score}} / 100（{{maturity_name}}）" },
+        { "type": "mrkdwn", "text": "*時程*\n{{timeline_label}}" },
+        { "type": "mrkdwn", "text": "*預算*\n{{budget_label}}" }
+      ]
+    },
+    { "type": "divider" },
+    {
+      "type": "section",
+      "text": { "type": "mrkdwn", "text": "*AI 診斷觀察*\n{{insight}}" }
+    },
+    {
+      "type": "section",
+      "text": { "type": "mrkdwn", "text": "*建議切入*\n{{primary_service_label}} → {{next_step_title}}" }
+    },
+    {
+      "type": "context",
+      "elements": [
+        { "type": "mrkdwn", "text": "得分明細　時程 +{{p_timeline}}｜決策 +{{p_role}}｜預算 +{{p_budget}}｜規模 +{{p_size}}｜完成度 +{{p_completed}}｜成熟度 +{{p_maturity}}｜來源 +{{p_source}}" }
+      ]
+    },
+    {
+      "type": "context",
+      "elements": [
+        { "type": "mrkdwn", "text": "⏱ SLA 到期　{{sla_due_local}}　·　來源 {{source}}" }
+      ]
+    },
+    {
+      "type": "actions",
+      "elements": [
+        {
+          "type": "button",
+          "style": "primary",
+          "text": { "type": "plain_text", "text": "我接這個", "emoji": true },
+          "value": "claim_{{lead_id}}",
+          "action_id": "claim_lead"
+        },
+        {
+          "type": "button",
+          "text": { "type": "plain_text", "text": "開 LINE 聊天室", "emoji": true },
+          "url": "https://chat.line.biz/{{oa_id}}/chat/{{line_user_id}}"
+        },
+        {
+          "type": "button",
+          "text": { "type": "plain_text", "text": "看完整診斷", "emoji": true },
+          "url": "https://supabase.com/dashboard/project/{{project_ref}}/editor?table=diagnostics&filter=session_id:{{session_id}}"
+        }
+      ]
+    }
+  ]
+}

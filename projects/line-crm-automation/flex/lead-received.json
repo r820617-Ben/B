@@ -1,0 +1,75 @@
+{
+  "type": "flex",
+  "altText": "資料已送到知育顧問手上｜{{sla_short}}",
+  "contents": {
+    "type": "bubble",
+    "size": "kilo",
+    "styles": {
+      "body": { "backgroundColor": "#0E1116" },
+      "footer": { "backgroundColor": "#0E1116" }
+    },
+    "body": {
+      "type": "box",
+      "layout": "vertical",
+      "paddingAll": "20px",
+      "contents": [
+        { "type": "text", "text": "已送出", "size": "xxs", "color": "#8A8F98", "letterSpacing": "3px" },
+        { "type": "text", "text": "{{name}}，收好了", "size": "lg", "color": "#E8EAED", "weight": "bold", "margin": "sm", "wrap": true },
+        { "type": "separator", "margin": "lg", "color": "#242A31" },
+        {
+          "type": "box",
+          "layout": "vertical",
+          "margin": "lg",
+          "spacing": "sm",
+          "contents": [
+            {
+              "type": "box",
+              "layout": "horizontal",
+              "contents": [
+                { "type": "text", "text": "公司", "size": "xs", "color": "#6B7280", "flex": 2 },
+                { "type": "text", "text": "{{company_name}}", "size": "xs", "color": "#B9BEC6", "flex": 5, "wrap": true }
+              ]
+            },
+            {
+              "type": "box",
+              "layout": "horizontal",
+              "contents": [
+                { "type": "text", "text": "需求", "size": "xs", "color": "#6B7280", "flex": 2 },
+                { "type": "text", "text": "{{segment_label}}", "size": "xs", "color": "#B9BEC6", "flex": 5, "wrap": true }
+              ]
+            },
+            {
+              "type": "box",
+              "layout": "horizontal",
+              "contents": [
+                { "type": "text", "text": "時程", "size": "xs", "color": "#6B7280", "flex": 2 },
+                { "type": "text", "text": "{{timeline_label}}", "size": "xs", "color": "#B9BEC6", "flex": 5 }
+              ]
+            }
+          ]
+        },
+        { "type": "separator", "margin": "lg", "color": "#242A31" },
+        { "type": "text", "text": "{{sla_message}}", "size": "sm", "color": "#C8A96A", "margin": "lg", "wrap": true }
+      ]
+    },
+    "footer": {
+      "type": "box",
+      "layout": "vertical",
+      "paddingAll": "20px",
+      "paddingTop": "0px",
+      "contents": [
+        {
+          "type": "button",
+          "style": "secondary",
+          "height": "sm",
+          "color": "#1A1F26",
+          "action": {
+            "type": "uri",
+            "label": "在那之前先看這個",
+            "uri": "{{resource_url}}"
+          }
+        }
+      ]
+    }
+  }
+}

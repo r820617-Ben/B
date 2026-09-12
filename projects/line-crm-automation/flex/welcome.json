@@ -1,0 +1,20 @@
+[
+  {
+    "type": "text",
+    "text": "嗨，我是知育 AI 成長助手。\n\n你從官網走到這裡，我就直接做給你看，不多做介紹。\n\n接下來大約 60 秒，我會問你幾個問題，幫你找出三件事：\n\n① 目前最值得優先改善的地方\n② 哪些工作適合先導入 AI\n③ 知育可以從哪裡開始協助你"
+  },
+  {
+    "type": "text",
+    "text": "你的回答只會用在這份診斷和後續聯繫，隨時可以停。\n\n先從第一題。你現在最有感的是哪一件？",
+    "quickReply": {
+      "items": [
+        { "type": "action", "action": { "type": "postback", "label": "📈 行銷成效不穩定", "data": "type=seg&v=GM", "displayText": "行銷成效不穩定" } },
+        { "type": "action", "action": { "type": "postback", "label": "🤖 想導入 AI 沒方向", "data": "type=seg&v=AX", "displayText": "想導入 AI 但沒方向" } },
+        { "type": "action", "action": { "type": "postback", "label": "⚙️ 團隊重複工作太多", "data": "type=seg&v=PO", "displayText": "團隊重複工作太多" } },
+        { "type": "action", "action": { "type": "postback", "label": "👥 想提升團隊能力", "data": "type=seg&v=CT", "displayText": "想提升團隊能力" } },
+        { "type": "action", "action": { "type": "postback", "label": "🧠 品牌經營卡住", "data": "type=seg&v=BC", "displayText": "品牌經營卡住" } },
+        { "type": "action", "action": { "type": "postback", "label": "❓ 還不確定問題在哪", "data": "type=seg&v=DS", "displayText": "還不確定問題在哪" } }
+      ]
+    }
+  }
+]

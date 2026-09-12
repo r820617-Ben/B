@@ -1,0 +1,219 @@
+{
+  "type": "flex",
+  "altText": "你的企業診斷結果出來了｜AI Ready Score {{score}}/100",
+  "contents": {
+    "type": "bubble",
+    "size": "mega",
+    "styles": {
+      "header": { "backgroundColor": "#0E1116" },
+      "body":   { "backgroundColor": "#0E1116" },
+      "footer": { "backgroundColor": "#0E1116", "separator": true, "separatorColor": "#242A31" }
+    },
+    "header": {
+      "type": "box",
+      "layout": "vertical",
+      "paddingAll": "20px",
+      "paddingBottom": "8px",
+      "contents": [
+        {
+          "type": "text",
+          "text": "知育 AI 企業診斷",
+          "size": "xs",
+          "color": "#8A8F98",
+          "letterSpacing": "2px"
+        },
+        {
+          "type": "text",
+          "text": "{{company_or_name}}",
+          "size": "lg",
+          "color": "#E8EAED",
+          "weight": "bold",
+          "margin": "6px",
+          "wrap": true
+        }
+      ]
+    },
+    "body": {
+      "type": "box",
+      "layout": "vertical",
+      "paddingAll": "20px",
+      "paddingTop": "4px",
+      "spacing": "none",
+      "contents": [
+        {
+          "type": "box",
+          "layout": "vertical",
+          "margin": "md",
+          "contents": [
+            {
+              "type": "text",
+              "text": "AI READY SCORE",
+              "size": "xxs",
+              "color": "#8A8F98",
+              "letterSpacing": "3px"
+            },
+            {
+              "type": "box",
+              "layout": "baseline",
+              "margin": "sm",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": "{{score}}",
+                  "size": "4xl",
+                  "color": "#C8A96A",
+                  "weight": "bold",
+                  "flex": 0
+                },
+                {
+                  "type": "text",
+                  "text": "/ 100",
+                  "size": "sm",
+                  "color": "#6B7280",
+                  "margin": "md",
+                  "flex": 0
+                },
+                {
+                  "type": "text",
+                  "text": "{{tier}}",
+                  "size": "xs",
+                  "color": "#C8A96A",
+                  "align": "end",
+                  "gravity": "bottom"
+                }
+              ]
+            },
+            {
+              "type": "box",
+              "layout": "vertical",
+              "margin": "md",
+              "height": "5px",
+              "backgroundColor": "#242A31",
+              "cornerRadius": "3px",
+              "contents": [
+                {
+                  "type": "box",
+                  "layout": "vertical",
+                  "width": "{{score}}%",
+                  "height": "5px",
+                  "backgroundColor": "#C8A96A",
+                  "cornerRadius": "3px",
+                  "contents": []
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "text": "{{maturity_name}}　·　Level {{maturity_level}}",
+              "size": "xs",
+              "color": "#8A8F98",
+              "margin": "md"
+            }
+          ]
+        },
+        {
+          "type": "separator",
+          "margin": "xl",
+          "color": "#242A31"
+        },
+        {
+          "type": "box",
+          "layout": "vertical",
+          "margin": "xl",
+          "spacing": "lg",
+          "contents": [
+            {
+              "type": "box",
+              "layout": "vertical",
+              "contents": [
+                { "type": "text", "text": "優先處理", "size": "xxs", "color": "#8A8F98", "letterSpacing": "2px" },
+                { "type": "text", "text": "{{priority_1}}", "size": "md", "color": "#E8EAED", "weight": "bold", "wrap": true, "margin": "xs" }
+              ]
+            },
+            {
+              "type": "box",
+              "layout": "vertical",
+              "contents": [
+                { "type": "text", "text": "次要", "size": "xxs", "color": "#8A8F98", "letterSpacing": "2px" },
+                { "type": "text", "text": "{{priority_2}}", "size": "sm", "color": "#B9BEC6", "wrap": true, "margin": "xs" }
+              ]
+            },
+            {
+              "type": "box",
+              "layout": "vertical",
+              "contents": [
+                { "type": "text", "text": "建議下一步", "size": "xxs", "color": "#8A8F98", "letterSpacing": "2px" },
+                { "type": "text", "text": "{{next_step_title}}", "size": "md", "color": "#C8A96A", "weight": "bold", "wrap": true, "margin": "xs" }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "separator",
+          "margin": "xl",
+          "color": "#242A31"
+        },
+        {
+          "type": "text",
+          "text": "{{insight_short}}",
+          "size": "xs",
+          "color": "#8A8F98",
+          "wrap": true,
+          "margin": "lg",
+          "lineSpacing": "6px"
+        }
+      ]
+    },
+    "footer": {
+      "type": "box",
+      "layout": "vertical",
+      "paddingAll": "20px",
+      "spacing": "sm",
+      "contents": [
+        {
+          "type": "button",
+          "style": "primary",
+          "height": "sm",
+          "color": "#C8A96A",
+          "action": {
+            "type": "postback",
+            "label": "交給顧問看",
+            "data": "type=cta&v=consult",
+            "displayText": "幫我交給顧問"
+          }
+        },
+        {
+          "type": "button",
+          "style": "secondary",
+          "height": "sm",
+          "color": "#1A1F26",
+          "action": {
+            "type": "uri",
+            "label": "看解決方案",
+            "uri": "https://zhiyu.tw/services?utm_source=line&utm_medium=diagnostic&utm_campaign={{session_id}}"
+          }
+        },
+        {
+          "type": "box",
+          "layout": "vertical",
+          "margin": "sm",
+          "contents": [
+            {
+              "type": "text",
+              "text": "我先看看",
+              "size": "xs",
+              "color": "#6B7280",
+              "align": "center",
+              "action": {
+                "type": "postback",
+                "label": "我先看看",
+                "data": "type=cta&v=later",
+                "displayText": "我先看看"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
