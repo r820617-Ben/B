@@ -1,0 +1,522 @@
+<title>知育 LINE 診斷設定台</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700&display=swap">
+<style>
+  :root{
+    --ground:#FBF9F5; --surface:#FFFFFF; --surface-2:#F4F1EA00;
+    --ink:#16181C; --ink-2:#3D4046; --muted:#6E6A62;
+    --accent:#8A6A18; --accent-soft:#8A6A1814;
+    --rule:#E5E0D6; --rule-strong:#D3CCBD;
+    --ok:#2F6B4F; --ok-soft:#2F6B4F12;
+    --code-bg:#F2EEE5;
+    --shadow:0 1px 0 rgba(22,24,28,.04);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0E1116; --surface:#161A20; --surface-2:#1A1F2600;
+      --ink:#E8EAED; --ink-2:#B9BEC6; --muted:#8A8F98;
+      --accent:#C8A96A; --accent-soft:#C8A96A1A;
+      --rule:#242A31; --rule-strong:#333A43;
+      --ok:#6FBF9A; --ok-soft:#6FBF9A14;
+      --code-bg:#111519;
+      --shadow:none;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0E1116; --surface:#161A20; --surface-2:#1A1F2600;
+    --ink:#E8EAED; --ink-2:#B9BEC6; --muted:#8A8F98;
+    --accent:#C8A96A; --accent-soft:#C8A96A1A;
+    --rule:#242A31; --rule-strong:#333A43;
+    --ok:#6FBF9A; --ok-soft:#6FBF9A14;
+    --code-bg:#111519;
+    --shadow:none;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    background:var(--ground); color:var(--ink);
+    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+    font-size:15px; line-height:1.7;
+    padding-inline:20px; padding-block:0 64px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px;margin:0 auto}
+
+  /* masthead */
+  header.mast{
+    padding-block:36px 20px;
+    border-bottom:1px solid var(--rule-strong);
+  }
+  .eyebrow{
+    font-family:"IBM Plex Mono",ui-monospace,monospace;
+    font-size:11px; letter-spacing:.22em; text-transform:uppercase;
+    color:var(--muted);
+  }
+  h1{
+    font-family:"Noto Serif TC",Georgia,serif; font-weight:700;
+    font-size:clamp(26px,4.4vw,40px); line-height:1.25;
+    margin:8px 0 0; text-wrap:balance; letter-spacing:.01em;
+  }
+  .sub{color:var(--ink-2);max-width:62ch;margin:12px 0 0;font-size:14.5px}
+
+  .meterrow{display:flex;flex-wrap:wrap;gap:18px 28px;align-items:flex-end;margin-top:26px}
+  .meter{flex:1 1 320px;min-width:260px}
+  .meter .nums{display:flex;align-items:baseline;gap:8px;font-variant-numeric:tabular-nums}
+  .meter .big{font-family:"IBM Plex Mono",monospace;font-size:34px;color:var(--accent);line-height:1}
+  .meter .of{font-size:13px;color:var(--muted)}
+  .bar{height:5px;border-radius:3px;background:var(--rule);margin-top:12px;overflow:hidden}
+  .bar > i{display:block;height:100%;background:var(--accent);border-radius:3px;transition:width .35s ease}
+  .mast-actions{display:flex;gap:10px;flex-wrap:wrap}
+
+  a.btn,button.btn{
+    font:inherit;font-size:13px;font-weight:500;
+    padding:9px 15px;border-radius:7px;cursor:pointer;
+    border:1px solid var(--rule-strong); background:var(--surface); color:var(--ink);
+    text-decoration:none;display:inline-flex;align-items:center;gap:7px;
+  }
+  a.btn.primary,button.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--ground)}
+  .btn:hover{border-color:var(--accent)}
+  .btn:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+  /* layout */
+  .cols{display:grid;grid-template-columns:210px minmax(0,1fr);gap:44px;margin-top:34px;align-items:start}
+  @media (max-width:900px){ .cols{grid-template-columns:1fr;gap:26px} nav.rail{position:static!important} }
+
+  nav.rail{position:sticky;top:18px}
+  .rail h2{font-size:11px;font-family:"IBM Plex Mono",monospace;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin:0 0 12px;font-weight:500}
+  .rail ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+  .rail a{
+    display:flex;justify-content:space-between;align-items:baseline;gap:10px;
+    padding:8px 10px;border-radius:6px;text-decoration:none;color:var(--ink-2);font-size:13.5px;
+  }
+  .rail a:hover{background:var(--accent-soft);color:var(--ink)}
+  .rail .cnt{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .rail .cnt.full{color:var(--ok)}
+  .railnote{margin-top:18px;font-size:12.5px;color:var(--muted);line-height:1.65}
+
+  /* stage */
+  section.stage{margin-bottom:52px;scroll-margin-top:16px}
+  .stagehead{display:flex;align-items:baseline;gap:14px;padding-bottom:10px;border-bottom:1px solid var(--rule-strong)}
+  .stagenum{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--accent);letter-spacing:.1em}
+  .stagehead h3{font-family:"Noto Serif TC",Georgia,serif;font-weight:700;font-size:21px;margin:0;flex:1}
+  .stagehead .where{font-size:12px;color:var(--muted);text-align:right}
+
+  /* entry */
+  article.entry{
+    display:grid;grid-template-columns:34px minmax(0,1fr);gap:0 14px;
+    padding:18px 0;border-bottom:1px solid var(--rule);
+  }
+  article.entry.done{opacity:.52}
+  article.entry.done .etitle{text-decoration:line-through;text-decoration-color:var(--muted)}
+  .idx{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);padding-top:3px;font-variant-numeric:tabular-nums}
+  .ebody{min-width:0}
+  .etop{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 12px}
+  .etitle{font-weight:700;font-size:15.5px;margin:0}
+  .kw{
+    font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px;
+    background:var(--accent-soft);color:var(--accent);
+    padding:2px 8px;border-radius:5px;white-space:nowrap;
+  }
+  .ehint{font-size:12.5px;color:var(--muted);margin:6px 0 0}
+
+  pre.msg{
+    margin:11px 0 0;padding:14px 15px;background:var(--code-bg);
+    border:1px solid var(--rule);border-radius:8px;
+    font-family:"Noto Sans TC","PingFang TC",sans-serif;
+    font-size:13.5px;line-height:1.85;color:var(--ink-2);
+    white-space:pre-wrap;word-break:break-word;max-height:none;
+  }
+
+  table.kv{width:100%;border-collapse:collapse;margin-top:11px;font-size:13.5px}
+  table.kv th,table.kv td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+  table.kv th{color:var(--muted);font-weight:400;width:38%;white-space:nowrap}
+  table.kv td{color:var(--ink-2)}
+  table.kv tr:last-child th,table.kv tr:last-child td{border-bottom:none}
+  .tablewrap{overflow-x:auto}
+
+  .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px}
+  .tags span{font-family:"IBM Plex Mono",monospace;font-size:12px;padding:3px 9px;border:1px solid var(--rule-strong);border-radius:20px;color:var(--ink-2)}
+
+  .erow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+  .copy{
+    font:inherit;font-size:12.5px;font-weight:500;cursor:pointer;
+    padding:6px 13px;border-radius:6px;border:1px solid var(--accent);
+    background:transparent;color:var(--accent);
+  }
+  .copy:hover{background:var(--accent-soft)}
+  .copy.ok{border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
+  label.chk{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);cursor:pointer;user-select:none}
+  label.chk input{width:15px;height:15px;accent-color:var(--ok);cursor:pointer}
+  .savenote{font-size:12px;color:var(--muted);margin-left:auto}
+
+  footer.foot{margin-top:56px;padding-top:22px;border-top:1px solid var(--rule-strong);font-size:13px;color:var(--muted);max-width:70ch}
+  footer.foot p{margin:0 0 10px}
+  .warn{border-left:3px solid var(--accent);padding:10px 0 10px 14px;margin:22px 0 0;font-size:13.5px;color:var(--ink-2)}
+
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div class="eyebrow">知育行銷 · 官方帳號 @520vqabi</div>
+    <h1>LINE 診斷設定台</h1>
+    <p class="sub">把官方帳號從客服帳號改成 60 秒企業診斷入口。開著這一頁，左邊照順序做，每一格按「複製」再貼進 LINE 後台就好。全部完成約三小時。</p>
+
+    <div class="meterrow">
+      <div class="meter">
+        <div class="nums"><span class="big" id="doneCount">0</span><span class="of">／ <span id="totalCount">0</span> 項完成</span></div>
+        <div class="bar"><i id="barFill" style="width:0%"></i></div>
+      </div>
+      <div class="mast-actions">
+        <a class="btn primary" href="https://manager.line.biz/account/@520vqabi" target="_blank" rel="noopener">開啟 LINE 後台</a>
+        <button class="btn" id="resetBtn" type="button">清除進度</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="cols">
+    <nav class="rail" aria-label="階段導覽">
+      <h2>階段</h2>
+      <ol id="railList"></ol>
+      <p class="railnote" id="syncNote">進度儲存中…</p>
+    </nav>
+    <main id="stages"></main>
+  </div>
+
+  <footer class="foot">
+    <p><strong>動工前先截圖。</strong>後台現有的自動回應訊息會被這一版覆蓋，先全部截圖存檔，改壞了才還原得回去。</p>
+    <p><strong>第四階段可以外包。</strong>27 則自動回應最耗時但不需要判斷，適合交給行政同仁照順序貼。把這一頁的連結傳給對方，兩個人看到的勾選狀態是同一份。</p>
+    <p><strong>這一版做不到的事。</strong>AI 即時生成診斷、自動計算名單分數、自動通知顧問、Day 1/3/7 自動追蹤。這些要接 Webhook 與資料庫，規格在專案的完整版文件裡。先用這一版收 50 到 100 筆真實回答，再決定要不要投入。</p>
+  </footer>
+</div>
+
+<script>
+/* ---------- 內容資料 ---------- */
+const STAGES = [
+  {
+    id:"s1", num:"階段一", title:"基礎設定", where:"LINE 後台 → 設定", entries:[
+      { id:"s1a", title:"回應設定", hint:"AI 自動回應訊息一定要關閉，它會跟關鍵字回應打架，回出不相干的內容。",
+        where:"設定 → 回應設定",
+        kv:[["聊天","開啟"],["自動回應訊息","開啟"],["AI 自動回應訊息","關閉"],["加入好友的歡迎訊息","開啟"],["回應時間","不設定，維持 24 小時"]] },
+      { id:"s1b", title:"基本檔案 · 狀態消息", where:"設定 → 檔案", kw:null,
+        hint:"出現在使用者的好友列表，是加好友後第二眼看到的東西。寫他能得到什麼，不要寫服務項目。",
+        msg:"60 秒企業診斷｜AI 導入與數位成長顧問" },
+      { id:"s1c", title:"基本檔案 · 簡介", where:"設定 → 檔案",
+        msg:"知育行銷有限公司。協助企業把 AI 用進實際營運，不只停在學會工具。\n\n加入好友可免費做一次企業診斷，60 秒得到改善方向與優先順序。" },
+      { id:"s1d", title:"聊天標籤", where:"聊天 → 右側標籤管理",
+        hint:"這一版沒有自動打標籤，顧問看完對話手動貼。一天不會超過 10 個人。",
+        tags:["需求_行銷","需求_AI","需求_流程","需求_培訓","需求_策略","AI程度_低","AI程度_中","AI程度_高","熱_立即","溫_三個月","冷_觀望","已完成診斷","已留資料","已聯繫"],
+        copyAll:"需求_行銷\n需求_AI\n需求_流程\n需求_培訓\n需求_策略\nAI程度_低\nAI程度_中\nAI程度_高\n熱_立即\n溫_三個月\n冷_觀望\n已完成診斷\n已留資料\n已聯繫" }
+    ]
+  },
+  {
+    id:"s2", num:"階段二", title:"圖文選單", where:"主頁 → 圖文選單 → 建立", entries:[
+      { id:"s2a", title:"選單基本設定", where:"圖文選單 → 建立",
+        kv:[["標題","知育企業診斷 主選單"],["使用期間","即日起，結束日期填三年後"],["選單列顯示文字","開始企業診斷"],["預設顯示方式","顯示"],["版型","大型 · 六格（2 列 3 欄）"]] },
+      { id:"s2b", title:"六格動作設定", where:"圖文選單 → 動作",
+        hint:"六格的動作類型全部選「文字」。使用者點下去等同於傳送那段文字，才會觸發第四階段的關鍵字回應。",
+        kv:[["左上　行銷成效不穩","傳送文字　#行銷"],["中上　想導入 AI","傳送文字　#AI"],["右上　重複工作太多","傳送文字　#流程"],["左下　想提升團隊","傳送文字　#培訓"],["中下　經營策略卡住","傳送文字　#策略"],["右下　不確定問題","傳送文字　#不確定"]],
+        copyAll:"#行銷\n#AI\n#流程\n#培訓\n#策略\n#不確定" },
+      { id:"s2c", title:"選單圖片規格", where:"交給設計同仁",
+        hint:"深色底配金色線條與文字，跟診斷結果卡同一組色，之後升級完整版不用重做。不要用滿版照片，手機上會糊。",
+        kv:[["尺寸","2500 × 1686 px"],["格式","PNG 或 JPG"],["檔案大小","1 MB 以內"],["單格可視範圍","833 × 843 px"],["底色","#0E1116"],["文字與線條","#C8A96A"]] }
+    ]
+  },
+  {
+    id:"s3", num:"階段三", title:"加入好友的歡迎訊息", where:"主頁 → 加入好友的歡迎訊息", entries:[
+      { id:"s3a", title:"歡迎訊息 第一則", where:"加入好友的歡迎訊息",
+        msg:"嗨，我是知育 AI 成長助手。\n\n你從官網走到這裡，我就直接做給你看，不多做介紹。\n\n接下來大約 60 秒，我會問你兩個問題，幫你找出三件事：\n\n① 目前最值得優先改善的地方\n② 哪些工作適合先導入 AI\n③ 知育可以從哪裡開始協助你" },
+      { id:"s3b", title:"歡迎訊息 第二則", where:"同一個編輯畫面點「新增訊息」",
+        hint:"隱私說明放在這裡，只講一次就好，不要每則都提。",
+        msg:"你的回答只會用在這份診斷和後續聯繫，隨時可以停。\n\n先從第一題。你現在最有感的是哪一件？\n\n請點下方選單，或直接回覆代碼：\n\n#行銷　行銷成效不穩定\n#AI　　想導入 AI 但沒方向\n#流程　團隊重複工作太多\n#培訓　想提升團隊能力\n#策略　品牌經營策略卡住\n#不確定　還不確定問題在哪" }
+    ]
+  },
+  {
+    id:"s4", num:"階段四", title:"自動回應訊息 27 則", where:"主頁 → 自動回應訊息 → 建立", entries:[
+      { id:"g1", group:"第一層分流", title:"L1 行銷", kw:"#行銷",
+        msg:"行銷成效不穩，多數時候問題不在投放技術。\n\n再問一題就給你結果。最卡的是哪一件？\n\nM1　有流量但沒有轉換\nM2　廣告成本一直往上\nM3　沒有人專職在做\n\n回覆代碼就好。" },
+      { id:"g2", title:"L1 AI", kw:"#AI",
+        msg:"好，AI 這塊我從最基本的開始問。\n\n公司現在用 AI 到什麼程度？\n\nA1　幾乎沒在用\nA2　員工各自在用，沒有統一做法\nA3　開始建流程了，但卡住\n\n回覆代碼就好。" },
+      { id:"g3", title:"L1 流程", kw:"#流程",
+        msg:"重複工作通常不是能力問題，是流程沒被畫出來。\n\n哪一類工作最吃掉團隊時間？\n\nP1　資料整理和做報表\nP2　客服和回覆訊息\nP3　內容產出\n\n回覆代碼就好。" },
+      { id:"g4", title:"L1 培訓", kw:"#培訓",
+        msg:"好，先確認對象，課程設計差很多。\n\n這次想訓練的是誰？\n\nT1　主管層\nT2　行銷或業務團隊\nT3　全體員工\n\n回覆代碼就好。" },
+      { id:"g5", title:"L1 策略", kw:"#策略",
+        msg:"策略卡住的時候，多數人會去找新方法。通常問題出在舊的決策沒有被結束。\n\n公司現在在哪個階段？\n\nS1　剛起步，還在找定位\nS2　成長中，但開始亂\nS3　穩定，但看不到下一步\n\n回覆代碼就好。" },
+      { id:"g6", title:"L1 不確定", kw:"#不確定",
+        msg:"沒關係，多數人一開始也說不清楚。我換個問法。\n\n如果明天整天沒有會議，你會先處理哪件事？\n\nD1　想辦法拉業績\nD2　整理內部流程\nD3　好好想策略\n\n回覆代碼就好。" },
+
+      { id:"g7", group:"不確定路由", title:"路由 D1", kw:"D1",
+        msg:"好，這句話很有資訊量。你在意的是需求端。\n\n那我從行銷這條線問。最卡的是哪一件？\n\nM1　有流量但沒有轉換\nM2　廣告成本一直往上\nM3　沒有人專職在做" },
+      { id:"g8", title:"路由 D2", kw:"D2",
+        msg:"好，你在意的是內部效率。\n\n哪一類工作最吃掉團隊時間？\n\nP1　資料整理和做報表\nP2　客服和回覆訊息\nP3　內容產出" },
+      { id:"g9", title:"路由 D3", kw:"D3",
+        msg:"好，你在意的是方向。\n\n公司現在在哪個階段？\n\nS1　剛起步，還在找定位\nS2　成長中，但開始亂\nS3　穩定，但看不到下一步" },
+
+      { id:"g10", group:"行銷線結果", title:"結果 M1 有流量沒轉換", kw:"M1",
+        msg:"【你的企業診斷結果】\n\n目前狀態\n流量進得來，但停在網站或訊息就結束了。前端有在運作，問題出在轉換路徑。\n\n最可能的原因\n有流量沒轉換，通常不是廣告的問題，而是落地頁講的東西跟廣告承諾的不是同一件事。第二常見的是沒有人回訊息，或回得太慢。\n\n先做這三件事\n① 把廣告點進去的第一個畫面，跟廣告文案並排看一次\n② 記錄一週的詢問到回覆平均時間\n③ 找出成效最好的三支素材，看共同點\n\nAI 可以先接手的\n訊息初步回覆、常見問題整理、廣告成效每週摘要。\n\n想聊得更細，回覆「顧問」，我幫你排。" },
+      { id:"g11", title:"結果 M2 成本一直漲", kw:"M2",
+        msg:"【你的企業診斷結果】\n\n目前狀態\n廣告還在跑，但單位成本持續上升，獲利空間被壓縮。\n\n最可能的原因\n成本上升多半來自兩件事：受眾重疊導致內部競價，以及素材疲乏。素材更新頻率跟不上曝光速度的時候，成本一定往上走。\n\n先做這三件事\n① 檢查是否有多組廣告打同一群人\n② 算出目前素材的平均使用天數\n③ 建立一個每週固定產出新素材的流程\n\nAI 可以先接手的\n素材發想、文案變體大量產出、競品素材整理。這三件做起來，素材更新頻率可以拉高三到五倍。\n\n想聊得更細，回覆「顧問」，我幫你排。" },
+      { id:"g12", title:"結果 M3 沒有人專職", kw:"M3",
+        msg:"【你的企業診斷結果】\n\n目前狀態\n行銷有在做，但沒有固定的人負責，執行節奏跟著空檔浮動。\n\n最可能的原因\n成效波動的根源是產出不規律，不是策略錯誤。這種狀況換代理商通常沒有用，因為對接和決策還是回到同一個人身上。\n\n先做這三件事\n① 指定一位內部窗口，先做三個月\n② 把每週要交出的東西列成清單，不超過五項\n③ 建立一份固定格式的週報\n\nAI 可以先接手的\n內容初稿、貼文排程規劃、數據整理成週報。讓沒有專職人員的狀況下，也能維持穩定產出。\n\n想聊得更細，回覆「顧問」，我幫你排。" },
+
+      { id:"g13", group:"AI 線結果", title:"結果 A1 幾乎沒在用", kw:"A1",
+        msg:"【你的企業診斷結果】\n\n目前狀態\n公司幾乎還沒開始用 AI。這個位置其實比想像中好處理，因為沒有錯誤習慣要改。\n\n最可能的卡點\n多數公司在這個階段會直接去比較工具。但工具選錯的成本，遠低於流程沒盤點的成本。\n\n先做這三件事\n① 挑一件你每週要做三次以上的工作，把步驟寫下來\n② 找一位願意試的同仁，先做這一件\n③ 一個月後看時間差，再決定要不要擴大\n\n適合的起點\n單點導入，不要一次全面。從內容產出或資料整理開始，兩週內就看得到差別。\n\n想聊得更細，回覆「顧問」，我幫你排。" },
+      { id:"g14", title:"結果 A2 各自在用", kw:"A2",
+        msg:"【你的企業診斷結果】\n\n目前狀態\n員工各自在用 AI，公司有動能，但成果品質不一致。\n\n最可能的卡點\n這個階段最常見的問題是同一件事三個人做出三種水準，而且沒有人知道誰的做法比較好。知識留在個人身上，離職就帶走。\n\n先做這三件事\n① 收集團隊目前實際在用的提示詞，放在同一個地方\n② 挑出效果最好的三組，訂成公司版本\n③ 把常用資料整理成一份共用的參考檔\n\n適合的起點\n把個人用法收斂成公司流程。這一步做完，AI 的產出才會變成公司資產。\n\n想聊得更細，回覆「顧問」，我幫你排。" },
+      { id:"g15", title:"結果 A3 建流程卡住", kw:"A3",
+        msg:"【你的企業診斷結果】\n\n目前狀態\n已經開始建流程，代表基礎在了。卡住通常是因為跨系統的資料沒有打通。\n\n最可能的卡點\n工具各自能用，但彼此不講話，中間還是要人工搬資料。這個階段的瓶頸從「會不會用」變成「接不接得起來」。\n\n先做這三件事\n① 畫出目前流程中還需要人工複製貼上的環節\n② 確認這些環節的資料來源是否有固定格式\n③ 從最高頻的那一段開始串接\n\n適合的起點\n自動化串接與知識庫建置。你的狀況談的層級跟剛起步的公司不一樣。\n\n想聊得更細，回覆「顧問」，我幫你排。" },
+
+      { id:"g16", group:"流程線結果", title:"結果 P1 資料與報表", kw:"P1",
+        msg:"【你的企業診斷結果】\n\n目前狀態\n資料整理和報表吃掉大量時間。這一類工作的特徵是重複、有明確規則、而且做完不會增加價值。\n\n最可能的原因\n資料散在不同地方，每次都要重新彙整。真正貴的不是時間，是它讓人沒有餘裕思考。\n\n先做這三件事\n① 記錄一週，算出實際花掉多少小時。多數老闆估的數字低於實際的一半\n② 確認資料的原始來源有幾個\n③ 把報表要回答的問題寫下來，通常不超過五個\n\n這一類最適合自動化\n固定格式的報表，是自動化投資報酬率最高的起點。做對的話，每週省下的時間可以直接換算成金額。\n\n想聊得更細，回覆「顧問」，我幫你排。" },
+      { id:"g17", title:"結果 P2 客服與訊息", kw:"P2",
+        msg:"【你的企業診斷結果】\n\n目前狀態\n客服和訊息回覆佔掉太多時間，而且無法排程，會打斷其他工作。\n\n最可能的原因\n八成的問題集中在兩成的題目上，但因為沒有整理過，每次都當新問題處理。\n\n先做這三件事\n① 把過去一個月的詢問抓出來，分成五到八類\n② 每一類寫一段標準回覆\n③ 標出哪幾類可以完全自動回，哪幾類一定要真人\n\n這一類最適合自動化\n常見問題分流加上自動回覆，通常可以吃掉五成到七成的量，剩下的留給真人處理。\n\n想聊得更細，回覆「顧問」，我幫你排。" },
+      { id:"g18", title:"結果 P3 內容產出", kw:"P3",
+        msg:"【你的企業診斷結果】\n\n目前狀態\n內容產出佔掉大量時間，而且產量跟品質很難同時維持。\n\n最可能的原因\n每次都從零開始。沒有素材庫、沒有固定結構、沒有可重複的流程，所以每一篇都像第一篇。\n\n先做這三件事\n① 把過去表現最好的五篇內容找出來，拆解它們的結構\n② 把結構寫成模板\n③ 建立一份素材庫，放品牌資訊、常用說法、案例數字\n\n這一類最適合導入 AI\n有了模板和素材庫，AI 產出初稿的品質會跳一個層級。沒有這兩樣東西，AI 寫出來的就是通用內容。\n\n想聊得更細，回覆「顧問」，我幫你排。" },
+
+      { id:"g19", group:"培訓線結果", title:"結果 T1 主管層", kw:"T1",
+        msg:"【你的企業診斷結果】\n\n訓練對象\n主管層。這一層的訓練重點跟執行層完全不同。\n\n最常見的誤區\n主管訓練如果只教工具操作，上完課不會有改變。主管要的是判斷力：哪些工作值得導入、怎麼評估成效、怎麼帶團隊一起改。\n\n建議的課程結構\n① 判斷哪些工作適合 AI 化的思考框架\n② 用自己部門的真實工作當案例實作\n③ 導入後的衡量方式與管理節奏\n\n適合的形式\n工作坊型態，半天到一天，一定要帶自己部門的真實案例來。純聽講的主管課，三個月後使用率接近零。\n\n想聊得更細，回覆「顧問」，我幫你排。" },
+      { id:"g20", title:"結果 T2 行銷業務", kw:"T2",
+        msg:"【你的企業診斷結果】\n\n訓練對象\n行銷或業務團隊。這一層是最快看到成效的族群，因為產出可以直接量化。\n\n最常見的誤區\n教一堆工具，但沒有告訴他們在自己的工作流程裡哪一段可以用。學完覺得有趣，回去還是用原本的方法。\n\n建議的課程結構\n① 從他們現有的工作流程切入，找出可以改的三個點\n② 每個點給一組可以直接複製的做法\n③ 課後兩週追蹤實際使用狀況\n\n適合的形式\n實作型課程，每人帶自己手上的真實任務。課程結束時要有可以直接用的產出。\n\n想聊得更細，回覆「顧問」，我幫你排。" },
+      { id:"g21", title:"結果 T3 全體員工", kw:"T3",
+        msg:"【你的企業診斷結果】\n\n訓練對象\n全體員工。範圍大，最需要注意的是不要一次教太多。\n\n最常見的誤區\n全員訓練常見的問題是內容太廣，每個人都聽了一點但都用不上。行政和業務的需求差很多，用同一套內容會兩邊都不滿意。\n\n建議的課程結構\n① 共同場次只教觀念和公司規範，兩小時以內\n② 依部門分組做實作，每組內容不同\n③ 指定各部門種子人員，後續由內部擴散\n\n適合的形式\n共同場次加分組實作。先問三位同仁每天最不想做的工作是什麼，那就是訓練的起點。\n\n想聊得更細，回覆「顧問」，我幫你排。" },
+
+      { id:"g22", group:"策略線結果", title:"結果 S1 剛起步", kw:"S1",
+        msg:"【你的企業診斷結果】\n\n目前狀態\n剛起步，還在找定位。這個階段的資源要花在驗證，不是花在建制度。\n\n最可能的問題\n起步期最貴的錯誤是同時做太多件事。每一件都做一點，每一件都沒有做到能判斷成敗的程度。\n\n先做這三件事\n① 寫下你目前在做的所有事，圈出三個月內會決定生死的那一件\n② 其餘的暫停，這是排隊，不是放棄\n③ 為那一件事訂出可以判斷成敗的數字\n\n這個階段適合的\n策略聚焦與定位釐清。導入 AI 和建制度都可以等，先把方向確定下來。\n\n想聊得更細，回覆「顧問」，我幫你排。" },
+      { id:"g23", title:"結果 S2 成長中但亂", kw:"S2",
+        msg:"【你的企業診斷結果】\n\n目前狀態\n成長中，但開始亂。這是最常見也最關鍵的階段。\n\n最可能的問題\n亂的來源通常不是人不夠，是流程還停在三個人的時候的做法。營收在長，但決策和溝通還是靠老闆一個人串起來。\n\n先做這三件事\n① 列出目前所有事情都要經過你的環節，圈出可以交出去的\n② 為交出去的部分訂出判斷原則，讓對方能自己決定\n③ 建立每週一次的固定檢視節奏\n\n這個階段適合的\n制度建立與流程盤點。AI 導入在這個階段的價值很高，因為可以補上人力還沒到位的缺口。\n\n想聊得更細，回覆「顧問」，我幫你排。" },
+      { id:"g24", title:"結果 S3 穩定但無下一步", kw:"S3",
+        msg:"【你的企業診斷結果】\n\n目前狀態\n穩定經營，但看不到下一步。這種狀況的焦慮通常比虧損更難處理。\n\n最可能的問題\n穩定期的問題很少是執行力，多半是所有資源都在維持現有業務，沒有人有餘裕去試新的東西。\n\n先做這三件事\n① 列出三件你知道該停但一直沒停的事\n② 從現有客戶中找出成長最快的那一群，看他們的共同點\n③ 撥出固定比例的資源做新嘗試，不要等有空\n\n這個階段適合的\n成長策略診斷。你需要的不是更努力執行現在的事，是找出下一條曲線在哪裡。\n\n想聊得更細，回覆「顧問」，我幫你排。" },
+
+      { id:"g25", group:"功能型回應", title:"顧問聯繫", kw:"顧問 · 找顧問 · 真人 · 聯繫",
+        hint:"四個關鍵字都加進同一則，比對方式選「完全一致」。問卷連結在第五階段建好之後回來補。",
+        msg:"好。留一下資料，顧問看到的時候就知道你的狀況，不用你再講一遍。\n\n填完大概 40 秒：\n（這裡貼上第五階段建立的問卷連結）\n\n填完之後，顧問會在一個工作天內親自聯繫你。不用付費，也不用先決定要不要合作。" },
+      { id:"g26", title:"重新開始", kw:"重新開始 · 重測",
+        msg:"好，重新來一次。\n\n你現在最有感的是哪一件？\n\n#行銷　行銷成效不穩定\n#AI　　想導入 AI 但沒方向\n#流程　團隊重複工作太多\n#培訓　想提升團隊能力\n#策略　品牌經營策略卡住\n#不確定　還不確定問題在哪" },
+      { id:"g27", title:"隱私與刪除", kw:"刪除我的資料 · 隱私",
+        msg:"你提供的資訊只用於這份企業診斷與後續聯繫，不會提供給第三方。\n\n要刪除資料的話，回覆「確認刪除」，我們會在三個工作天內處理完成並回覆你。" }
+    ]
+  },
+  {
+    id:"s5", num:"階段五", title:"問卷調查", where:"主頁 → 問卷調查 → 建立", entries:[
+      { id:"s5a", title:"問卷基本設定", where:"問卷調查 → 建立",
+        kv:[["標題","知育企業診斷｜顧問聯繫資料"],["說明","這些資料只用於安排顧問聯繫，不會提供給第三方。"],["公開範圍","僅限好友"],["收集期間","不設限"]] },
+      { id:"s5b", title:"九道題目", where:"問卷調查 → 題目",
+        hint:"第 7 題預算一定要設成非必填，括號那句也不要拿掉。這題是整份問卷流失率最高的地方。",
+        kv:[
+          ["1　怎麼稱呼你？","單行文字 · 必填"],
+          ["2　公司名稱","單行文字 · 必填"],
+          ["3　主要產業","單選 · 必填：食品餐飲／零售電商／製造業／服務業／教育訓練／醫療健康／B2B 專業服務／其他"],
+          ["4　你在公司的角色","單選 · 必填：負責人或執行長／副總或總監／經理或主管／專員"],
+          ["5　公司規模","單選 · 必填：1–5 人／6–19 人／20–49 人／50 人以上"],
+          ["6　如果要開始，大概什麼時候","單選 · 必填：立即／1–3 個月／3–6 個月／先了解看看"],
+          ["7　預算範圍（只是讓顧問知道要提什麼方案，不是報價）","單選 · 非必填：尚未確認／5 萬以下／5–10 萬／10–30 萬／30 萬以上"],
+          ["8　方便的聯繫方式","單選 · 必填：LINE 就好／Email／手機"],
+          ["9　Email 或手機（第 8 題不是選 LINE 才填）","單行文字 · 非必填"]
+        ] },
+      { id:"s5c", title:"回頭補問卷連結", where:"回到 自動回應訊息 → 顧問聯繫",
+        hint:"問卷建立完成後會產生一組連結。回到第四階段最後那則「顧問聯繫」，把括號那一行換成真正的連結。做完這一項，整套流程才會通。",
+        kv:[["要修改的自動回應","關鍵字 顧問"],["要替換的那一行","（這裡貼上第五階段建立的問卷連結）"]] }
+  ]
+  }
+];
+
+/* ---------- 狀態 ---------- */
+const DOC_PATH = "progress/setup";
+let done = {};
+let dbRef = null;
+let applying = false;
+const allIds = STAGES.flatMap(s => s.entries.map(e => e.id));
+
+function lsLoad(){ try{ return JSON.parse(localStorage.getItem("zhiyu-line-setup") || "{}"); }catch(e){ return {}; } }
+function lsSave(v){ try{ localStorage.setItem("zhiyu-line-setup", JSON.stringify(v)); }catch(e){} }
+
+function setNote(t){ const n = document.getElementById("syncNote"); if(n) n.textContent = t; }
+
+function persist(){
+  lsSave(done);
+  if(dbRef){
+    dbRef.set({ done: done, updatedAt: new Date().toISOString() })
+      .catch(err => setNote("進度只存在這台裝置（" + (err && err.code ? err.code : "同步失敗") + "）"));
+  }
+}
+
+/* ---------- 繪製 ---------- */
+function el(tag, cls, txt){ const n = document.createElement(tag); if(cls) n.className = cls; if(txt != null) n.textContent = txt; return n; }
+
+function makeCopyBtn(text, label){
+  const b = el("button", "copy", label || "複製訊息");
+  b.type = "button";
+  b.addEventListener("click", async () => {
+    let ok = false;
+    try { await navigator.clipboard.writeText(text); ok = true; }
+    catch(e){
+      const ta = document.createElement("textarea");
+      ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      try { ok = document.execCommand("copy"); } catch(e2){ ok = false; }
+      document.body.removeChild(ta);
+    }
+    b.textContent = ok ? "已複製" : "請手動選取內文";
+    b.classList.toggle("ok", ok);
+    setTimeout(() => { b.textContent = label || "複製訊息"; b.classList.remove("ok"); }, 2000);
+  });
+  return b;
+}
+
+function renderEntry(e, idx){
+  const art = el("article", "entry");
+  art.id = "e-" + e.id;
+  art.appendChild(el("div", "idx", String(idx).padStart(2, "0")));
+
+  const body = el("div", "ebody");
+  const top = el("div", "etop");
+  const h = el("h4", "etitle", e.title);
+  top.appendChild(h);
+  if(e.kw) top.appendChild(el("span", "kw", e.kw));
+  if(e.where) top.appendChild(el("span", "ehint", e.where));
+  body.appendChild(top);
+
+  if(e.hint) body.appendChild(el("p", "ehint", e.hint));
+
+  if(e.kv){
+    const w = el("div", "tablewrap");
+    const t = el("table", "kv");
+    e.kv.forEach(([k, v]) => {
+      const tr = document.createElement("tr");
+      tr.appendChild(el("th", null, k));
+      tr.appendChild(el("td", null, v));
+      t.appendChild(tr);
+    });
+    w.appendChild(t); body.appendChild(w);
+  }
+
+  if(e.tags){
+    const box = el("div", "tags");
+    e.tags.forEach(t => box.appendChild(el("span", null, t)));
+    body.appendChild(box);
+  }
+
+  if(e.msg){
+    const pre = el("pre", "msg", e.msg);
+    body.appendChild(pre);
+  }
+
+  const row = el("div", "erow");
+  if(e.msg) row.appendChild(makeCopyBtn(e.msg, "複製訊息"));
+  if(e.kw) row.appendChild(makeCopyBtn(e.kw.split(" · ").join("\n"), "複製關鍵字"));
+  if(e.copyAll) row.appendChild(makeCopyBtn(e.copyAll, "複製全部"));
+
+  const lab = el("label", "chk");
+  const cb = document.createElement("input");
+  cb.type = "checkbox"; cb.id = "cb-" + e.id;
+  cb.addEventListener("change", () => {
+    if(applying) return;
+    if(cb.checked) done[e.id] = true; else delete done[e.id];
+    art.classList.toggle("done", cb.checked);
+    refreshCounts(); persist();
+  });
+  lab.appendChild(cb); lab.appendChild(document.createTextNode("已完成"));
+  row.appendChild(lab);
+  body.appendChild(row);
+
+  art.appendChild(body);
+  return art;
+}
+
+function render(){
+  const main = document.getElementById("stages");
+  const rail = document.getElementById("railList");
+  let n = 0;
+  STAGES.forEach(s => {
+    const sec = el("section", "stage"); sec.id = s.id;
+    const head = el("div", "stagehead");
+    head.appendChild(el("span", "stagenum", s.num));
+    head.appendChild(el("h3", null, s.title));
+    head.appendChild(el("span", "where", s.where));
+    sec.appendChild(head);
+
+    let lastGroup = null;
+    s.entries.forEach(e => {
+      if(e.group && e.group !== lastGroup){
+        const g = el("p", "ehint", e.group);
+        g.style.marginTop = "18px";
+        g.style.color = "var(--accent)";
+        g.style.fontWeight = "700";
+        sec.appendChild(g);
+        lastGroup = e.group;
+      }
+      n += 1;
+      sec.appendChild(renderEntry(e, n));
+    });
+    main.appendChild(sec);
+
+    const li = document.createElement("li");
+    const a = document.createElement("a");
+    a.href = "#" + s.id;
+    a.appendChild(el("span", null, s.title));
+    const c = el("span", "cnt"); c.dataset.stage = s.id;
+    a.appendChild(c);
+    li.appendChild(a);
+    rail.appendChild(li);
+  });
+  document.getElementById("totalCount").textContent = String(allIds.length);
+}
+
+function refreshCounts(){
+  const total = allIds.length;
+  const d = allIds.filter(id => done[id]).length;
+  document.getElementById("doneCount").textContent = String(d);
+  document.getElementById("barFill").style.width = (total ? (d / total * 100) : 0) + "%";
+  STAGES.forEach(s => {
+    const c = document.querySelector('.cnt[data-stage="' + s.id + '"]');
+    if(!c) return;
+    const sd = s.entries.filter(e => done[e.id]).length;
+    c.textContent = sd + "/" + s.entries.length;
+    c.classList.toggle("full", sd === s.entries.length);
+  });
+}
+
+function applyState(){
+  applying = true;
+  allIds.forEach(id => {
+    const cb = document.getElementById("cb-" + id);
+    const art = document.getElementById("e-" + id);
+    if(!cb || !art) return;
+    const v = !!done[id];
+    cb.checked = v;
+    art.classList.toggle("done", v);
+  });
+  applying = false;
+  refreshCounts();
+}
+
+/* ---------- 啟動 ---------- */
+render();
+done = lsLoad();
+applyState();
+setNote("進度存在這台裝置。");
+
+document.getElementById("resetBtn").addEventListener("click", () => {
+  done = {}; applyState(); persist();
+});
+
+(async () => {
+  try {
+    const db = await (window.claude && window.claude.use ? window.claude.use("db") : Promise.resolve(null));
+    if(!db) return;
+    dbRef = db.doc(DOC_PATH);
+    dbRef.onSnapshot(
+      snap => {
+        const data = snap.exists ? snap.data() : null;
+        if(data && data.done && typeof data.done === "object"){
+          done = Object.assign({}, data.done);
+          lsSave(done);
+          applyState();
+        }
+        setNote("進度同步中，把這頁的連結傳給同仁，兩邊看到的勾選一樣。");
+      },
+      err => { dbRef = null; setNote("進度只存在這台裝置（" + (err && err.code ? err.code : "同步中斷") + "）"); }
+    );
+  } catch(e){ dbRef = null; }
+})();
+</script>
