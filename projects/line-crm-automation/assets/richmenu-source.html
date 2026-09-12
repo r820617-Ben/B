@@ -1,0 +1,70 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=Noto+Sans+TC:wght@500;700&display=swap">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:2500px;height:1686px;background:#0E1116;overflow:hidden}
+  .grid{width:2500px;height:1686px;display:grid;
+        grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr)}
+  .cell{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:46px;
+        font-family:"Noto Sans TC",sans-serif}
+  /* hairline separators drawn as insets so the outer edge stays clean */
+  .cell::after{content:"";position:absolute;inset:0;pointer-events:none}
+  .c2::after,.c5::after{border-left:2px solid #262C34;border-right:2px solid #262C34}
+  .c4::after,.c5::after,.c6::after{border-top:2px solid #262C34}
+  svg{display:block}
+  .lab{font-size:74px;font-weight:700;color:#E8EAED;letter-spacing:.04em;line-height:1}
+  .code{font-family:"IBM Plex Mono","Noto Sans TC",monospace;font-size:34px;font-weight:500;
+        color:#C8A96A;letter-spacing:.14em;margin-top:-22px}
+  .brand{position:absolute;left:0;right:0;bottom:0;height:0}
+</style></head><body>
+<div class="grid">
+
+  <div class="cell c1">
+    <svg width="150" height="150" viewBox="0 0 60 60" fill="none" stroke="#C8A96A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M7 8v44h46"/><path d="M14 34l10-11 9 8 9-14 10 6"/><circle cx="24" cy="23" r="2.6" fill="#C8A96A" stroke="none"/><circle cx="42" cy="17" r="2.6" fill="#C8A96A" stroke="none"/>
+    </svg>
+    <div class="lab">行銷成效不穩</div><div class="code">#行銷</div>
+  </div>
+
+  <div class="cell c2">
+    <svg width="150" height="150" viewBox="0 0 60 60" fill="none" stroke="#C8A96A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="18" y="18" width="24" height="24" rx="4"/><rect x="26" y="26" width="8" height="8" rx="1.5"/>
+      <path d="M24 18V9M36 18V9M24 51v-9M36 51v-9M18 24H9M18 36H9M51 24h-9M51 36h-9"/>
+    </svg>
+    <div class="lab">想導入 AI</div><div class="code">#AI</div>
+  </div>
+
+  <div class="cell c3">
+    <svg width="150" height="150" viewBox="0 0 60 60" fill="none" stroke="#C8A96A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 24a19 19 0 0 1 32-8"/><path d="M44 8v9h-9"/>
+      <path d="M48 36a19 19 0 0 1-32 8"/><path d="M16 52v-9h9"/>
+    </svg>
+    <div class="lab">重複工作太多</div><div class="code">#流程</div>
+  </div>
+
+  <div class="cell c4">
+    <svg width="150" height="150" viewBox="0 0 60 60" fill="none" stroke="#C8A96A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="30" cy="20" r="8"/><path d="M16 46a14 14 0 0 1 28 0"/>
+      <circle cx="12" cy="26" r="5.5"/><path d="M4 44a10 10 0 0 1 8-9.6"/>
+      <circle cx="48" cy="26" r="5.5"/><path d="M56 44a10 10 0 0 0-8-9.6"/>
+    </svg>
+    <div class="lab">想提升團隊</div><div class="code">#培訓</div>
+  </div>
+
+  <div class="cell c5">
+    <svg width="150" height="150" viewBox="0 0 60 60" fill="none" stroke="#C8A96A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="30" cy="30" r="22"/><circle cx="30" cy="30" r="11"/>
+      <path d="M38 22 33 33l-11 5 5-11z"/><circle cx="30" cy="30" r="2.4" fill="#C8A96A" stroke="none"/>
+    </svg>
+    <div class="lab">經營策略卡住</div><div class="code">#策略</div>
+  </div>
+
+  <div class="cell c6">
+    <svg width="150" height="150" viewBox="0 0 60 60" fill="none" stroke="#C8A96A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="30" cy="30" r="22"/>
+      <path d="M23.5 23.5a6.8 6.8 0 1 1 7.6 10.1v3.6"/><circle cx="31" cy="43" r="2.4" fill="#C8A96A" stroke="none"/>
+    </svg>
+    <div class="lab">不確定問題</div><div class="code">#不確定</div>
+  </div>
+
+</div></body></html>
