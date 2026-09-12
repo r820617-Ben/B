@@ -30,7 +30,10 @@ LINE 官方帳號：`@520vqabi`　加入連結：https://lin.ee/8Ieo7Rk
 | 09 | `09-error-handling.md` | 例外情境、降級策略、防呆 |
 | 10 | `10-technical-spec.md` | Webhook 規格、內部 API 契約、驗收標準 |
 | 11 | `11-website-integration.md` | 官網 CTA、Source Tracking 三種做法與取捨 |
+| 12 | `12-line-oa-manager-setup.md` | **無代碼版**：只用 LINE 官方帳號後台，一個下午可上線 |
 | — | `flex/*.json` | 可直接使用的 Flex Message JSON |
+
+**先做第 12 份。** 完整版需要工程師 11 到 16 天；無代碼版今天下午就能上線，先收 50 到 100 筆真實回答，再用這些資料校準完整版的題目與文案。
 
 ---
 
