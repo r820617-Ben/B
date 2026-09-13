@@ -1,0 +1,16 @@
+{
+  "_說明": "manager.line.biz 的 DOM 會改版，這裡的選擇器必須由執行的人實際檢查後填入。跑 --inspect 會把頁面結構存到 output/，照著填。填完把 _filled 改成 true，--auto 才會執行。",
+  "_filled": false,
+  "autoReply": {
+    "listUrl": "https://manager.line.biz/account/{OA_ID}/autoresponse",
+    "createButton": "",
+    "titleInput": "",
+    "keywordToggle": "",
+    "keywordInput": "",
+    "keywordAddButton": "",
+    "messageTextarea": "",
+    "saveButton": "",
+    "saveConfirmButton": "",
+    "successIndicator": ""
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "size": { "width": 2500, "height": 1686 },
+  "selected": true,
+  "name": "知育企業診斷 主選單",
+  "chatBarText": "開始企業診斷",
+  "areas": [
+    { "bounds": { "x": 0,    "y": 0,   "width": 833, "height": 843 }, "action": { "type": "message", "label": "行銷成效不穩", "text": "#行銷" } },
+    { "bounds": { "x": 833,  "y": 0,   "width": 834, "height": 843 }, "action": { "type": "message", "label": "想導入 AI",   "text": "#AI" } },
+    { "bounds": { "x": 1667, "y": 0,   "width": 833, "height": 843 }, "action": { "type": "message", "label": "重複工作太多", "text": "#流程" } },
+    { "bounds": { "x": 0,    "y": 843, "width": 833, "height": 843 }, "action": { "type": "message", "label": "想提升團隊",   "text": "#培訓" } },
+    { "bounds": { "x": 833,  "y": 843, "width": 834, "height": 843 }, "action": { "type": "message", "label": "經營策略卡住", "text": "#策略" } },
+    { "bounds": { "x": 1667, "y": 843, "width": 833, "height": 843 }, "action": { "type": "message", "label": "不確定問題",   "text": "#不確定" } }
+  ]
+}

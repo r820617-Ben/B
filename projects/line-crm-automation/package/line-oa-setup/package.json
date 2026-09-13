@@ -1,0 +1,20 @@
+{
+  "name": "zhiyu-line-oa-setup",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "知育行銷 LINE 官方帳號 @520vqabi 的企業診斷流程自動化佈署工具",
+  "engines": { "node": ">=18.17" },
+  "scripts": {
+    "verify": "node src/verify.mjs",
+    "richmenu": "node src/richmenu.mjs",
+    "richmenu:clean": "node src/richmenu.mjs --clean",
+    "oa:assist": "node src/oa-manager.mjs --assist",
+    "oa:auto": "node src/oa-manager.mjs --auto",
+    "export:txt": "node src/export-txt.mjs"
+  },
+  "dependencies": {},
+  "optionalDependencies": {
+    "playwright": "^1.49.0"
+  }
+}
