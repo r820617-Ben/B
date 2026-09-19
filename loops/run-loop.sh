@@ -52,6 +52,7 @@ NO_PROGRESS_LIMIT="$(cfg no_progress_limit)"; NO_PROGRESS_LIMIT="${NO_PROGRESS_L
 VERIFIER="$(cfg verifier)";             VERIFIER="${VERIFIER:-.claude/skills/loop-verifier.md}"
 WATCH="$(cfg watch)";                   WATCH="${WATCH:-.}"
 PERM_MODE="$(cfg permission_mode)";     PERM_MODE="${PERM_MODE:-acceptEdits}"
+INPUT_FILE="$(cfg input)"
 MODEL="$(cfg model)"
 
 STATE_FILE="loops/state/${NAME}.md"
@@ -107,6 +108,17 @@ fi
 
 : > "$LOG_FILE"
 log "迴圈開始：$NAME"
+
+INPUT_BLOCK=""
+if [ -n "$INPUT_FILE" ]; then
+  if [ ! -f "$INPUT_FILE" ]; then
+    log "找不到 input 檔：$INPUT_FILE"
+    log "用 input: <路徑> 指定這次要處理的輸入，或把該檔案建好再跑"
+    exit 1
+  fi
+  INPUT_BLOCK="$(cat "$INPUT_FILE")"
+  log "輸入：$INPUT_FILE"
+fi
 log "護欄：最多 $MAX_ITER 輪｜成本上限 \$$MAX_COST｜連續 $NO_PROGRESS_LIMIT 輪無進展就停"
 [ "$DRY_RUN" = 1 ] && log "（dry-run：只印提示詞，不呼叫 Claude）"
 
@@ -128,6 +140,9 @@ while [ "$ITER" -lt "$MAX_ITER" ]; do
 
 ## 迴圈定義
 $BODY
+
+## 本次輸入${INPUT_FILE:+（$INPUT_FILE）}
+${INPUT_BLOCK:-（這個迴圈沒有指定 input 檔）}
 
 ## 目前狀態（外部記憶體：$STATE_FILE）
 $(cat "$STATE_FILE")
