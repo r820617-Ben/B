@@ -35,7 +35,13 @@ IG 輪播（7–8 張）、短影音口播腳本（60–90 秒）、客戶週報
 
 ## 自動化
 會重複的產出做成迴圈，不要每次手動下指令。
-方法論在 .claude/skills/loop-engineering.md，迴圈定義在 loops/，執行用 loops/run-loop.sh。
+方法論在 .claude/skills/loop-engineering.md，迴圈定義在 loops/。
+單關用 loops/run-loop.sh，整條流程用 loops/run-pipeline.sh。
+
+新客戶的完整流程：原始資料丟進 intake/<客戶>.md，然後
+loops/run-pipeline.sh loops/pipelines/marketing-campaign.md --client <客戶>
+會依序跑出 brief、企劃、第一個月內容、發文排程。
+
 我說「幫我建一個 XXX 的迴圈」時，用 /loop 指令的規格寫定義檔。
 
 ## 工作原則

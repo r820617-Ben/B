@@ -6,17 +6,16 @@ no_progress_limit: 2
 verifier: .claude/skills/loop-verifier.md
 watch: proposals
 permission_mode: acceptEdits
-input: proposals/briefs/範例客戶.md
 ---
 
 # 迴圈：行銷企劃
 
 ## 目標
-把一份客戶需求，做成可以直接送出去的行銷企劃，存到 `proposals/<客戶>-<YYYYMMDD>.md`。
+把一份客戶需求，做成可以直接送出去的行銷企劃，存到這一關指定的產出路徑。
 
 ## 輸入
-- 需求來源：設定區 `input:` 指到的 brief 檔，內容會整段貼在「本次輸入」底下
-- 換客戶就改設定區的 `input:` 路徑，不要改這段文字
+- 需求來源：「本次輸入」底下就是這個客戶的 brief
+- 單獨跑時用 `--input <brief 路徑> --client <客戶>` 指定
 - 企劃規範：`.claude/skills/marketing-plan.md`（章節結構和硬規格都在裡面）
 - 客戶背景：`clients/<客戶>/CLAUDE.md`，有的話語氣以它為主
 - 禁用規則：`anti-style.md`
@@ -31,7 +30,7 @@ input: proposals/briefs/範例客戶.md
 4. 寫完自己先算一次預算表加總，對不上就當場修
 
 ## 停止條件（全部符合才算做完）
-- [ ] `proposals/` 底下有這份企劃檔，檔名是 `<客戶>-<YYYYMMDD>.md`
+- [ ] 產出檔存在，路徑就是「這一關要產出的檔案」指定的那一個
 - [ ] 八個章節齊全且順序正確：現況與問題、目標、受眾、策略主軸、執行方案、排程、預算、KPI 與驗收
 - [ ] 目標 2–3 個，每個都有基準值、目標值、期限三個數字
 - [ ] 受眾主要一組、次要最多一組，每組四個欄位都填了

@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
 # Loop Engineering harness
-# 用法：loops/run-loop.sh loops/<迴圈名>.md [--dry-run]
+# 用法：loops/run-loop.sh loops/<迴圈名>.md [選項]
+#
+# 選項：
+#   --dry-run            只印提示詞，不呼叫 Claude
+#   --input PATH         覆蓋定義檔的 input:
+#   --target PATH        這一關要產出的檔案，跑完會檢查它在不在
+#   --client 名稱        代入定義檔裡的 {{client}}
+#   --date YYYYMMDD      代入 {{date}}，預設今天
+#   --state-name 名稱    狀態檔與日誌改用這個名字，讓不同客戶各記各的
 #
 # 做的事：反覆呼叫 Claude 執行迴圈定義檔裡的目標，每輪跑完由獨立的驗證者
 # 判斷有沒有達到停止條件，並用三道護欄（次數、成本、無進展）決定何時停手。
@@ -11,12 +19,31 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT" || exit 1
 
 # ---------- 參數 ----------
-LOOP_FILE="${1:-}"
+LOOP_FILE="${1:-}"; shift || true
 DRY_RUN=0
-[ "${2:-}" = "--dry-run" ] && DRY_RUN=1
+OPT_INPUT=""; OPT_TARGET=""; OPT_CLIENT=""; OPT_DATE=""; OPT_STATE_NAME=""
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --dry-run)    DRY_RUN=1 ;;
+    --input)      OPT_INPUT="${2:-}"; shift ;;
+    --target)     OPT_TARGET="${2:-}"; shift ;;
+    --client)     OPT_CLIENT="${2:-}"; shift ;;
+    --date)       OPT_DATE="${2:-}"; shift ;;
+    --state-name) OPT_STATE_NAME="${2:-}"; shift ;;
+    *) echo "不認識的選項：$1" >&2; exit 1 ;;
+  esac
+  shift
+done
+
+CLIENT="${OPT_CLIENT:-${LOOP_CLIENT:-}}"
+RUN_DATE="${OPT_DATE:-${LOOP_DATE:-$(date '+%Y%m%d')}}"
+
+# {{client}} / {{date}} 代換，讓同一個定義檔跑不同客戶
+subst() { printf '%s' "$1" | sed -e "s|{{client}}|$CLIENT|g" -e "s|{{date}}|$RUN_DATE|g"; }
 
 if [ -z "$LOOP_FILE" ] || [ ! -f "$LOOP_FILE" ]; then
-  echo "用法：loops/run-loop.sh loops/<迴圈名>.md [--dry-run]" >&2
+  echo "用法：loops/run-loop.sh loops/<迴圈名>.md [--dry-run] [--input PATH] [--client 名稱]" >&2
   echo "可用的迴圈：" >&2
   ls -1 loops/*.md 2>/dev/null | grep -v README >&2
   exit 1
@@ -54,9 +81,18 @@ WATCH="$(cfg watch)";                   WATCH="${WATCH:-.}"
 PERM_MODE="$(cfg permission_mode)";     PERM_MODE="${PERM_MODE:-acceptEdits}"
 INPUT_FILE="$(cfg input)"
 MODEL="$(cfg model)"
+TARGET_FILE="$(cfg target)"
+CALL_TIMEOUT="$(cfg call_timeout_seconds)"; CALL_TIMEOUT="${CALL_TIMEOUT:-600}"
 
-STATE_FILE="loops/state/${NAME}.md"
-LOG_FILE="loops/state/${NAME}.log"
+BODY="$(subst "$BODY")"
+WATCH="$(subst "$WATCH")"
+INPUT_FILE="$(subst "${OPT_INPUT:-$INPUT_FILE}")"
+TARGET_FILE="$(subst "${OPT_TARGET:-$TARGET_FILE}")"
+
+STATE_NAME="${OPT_STATE_NAME:-$NAME}"
+STATE_FILE="loops/state/${STATE_NAME}.md"
+LOG_FILE="loops/state/${STATE_NAME}.log"
+COST_FILE="loops/state/${STATE_NAME}.cost"
 mkdir -p loops/state
 
 # ---------- 工具 ----------
@@ -81,8 +117,15 @@ run_claude() {  # $1=prompt；成功回 0，失敗回 1
   [ -n "$MODEL" ] && args+=(--model "$MODEL")
 
   : > "$CLAUDE_JSON"
-  claude "${args[@]}" < /dev/null > "$CLAUDE_JSON" 2>>"$LOG_FILE"
+  # 護欄四：單次呼叫逾時。前三道護欄只在兩次呼叫之間檢查，
+  # 呼叫本身掛住的話誰都擋不了，所以這裡硬砍。
+  timeout "$CALL_TIMEOUT" claude "${args[@]}" < /dev/null > "$CLAUDE_JSON" 2>>"$LOG_FILE"
   local rc=$?
+  if [ $rc -eq 124 ]; then
+    LAST_COST=0
+    log "單次呼叫超過 ${CALL_TIMEOUT}s，砍掉"
+    return 2
+  fi
   if [ $rc -ne 0 ] || [ ! -s "$CLAUDE_JSON" ]; then
     LAST_COST=0
     return 1
@@ -119,7 +162,9 @@ if [ -n "$INPUT_FILE" ]; then
   INPUT_BLOCK="$(cat "$INPUT_FILE")"
   log "輸入：$INPUT_FILE"
 fi
-log "護欄：最多 $MAX_ITER 輪｜成本上限 \$$MAX_COST｜連續 $NO_PROGRESS_LIMIT 輪無進展就停"
+[ -n "$TARGET_FILE" ] && log "產出：$TARGET_FILE"
+[ -n "$CLIENT" ] && log "客戶：$CLIENT"
+log "護欄：最多 $MAX_ITER 輪｜成本上限 \$$MAX_COST｜連續 $NO_PROGRESS_LIMIT 輪無進展就停｜單次呼叫上限 ${CALL_TIMEOUT}s"
 [ "$DRY_RUN" = 1 ] && log "（dry-run：只印提示詞，不呼叫 Claude）"
 
 TOTAL_COST=0
@@ -140,6 +185,9 @@ while [ "$ITER" -lt "$MAX_ITER" ]; do
 
 ## 迴圈定義
 $BODY
+
+## 這一關要產出的檔案
+${TARGET_FILE:-（定義檔沒指定 target，照迴圈定義自己決定路徑）}
 
 ## 本次輸入${INPUT_FILE:+（$INPUT_FILE）}
 ${INPUT_BLOCK:-（這個迴圈沒有指定 input 檔）}
@@ -165,7 +213,12 @@ EOF
   fi
 
   log "生產者執行中…"
-  if ! run_claude "$MAKER_PROMPT"; then
+  run_claude "$MAKER_PROMPT"; rc=$?
+  if [ $rc -eq 2 ]; then
+    STOP_REASON="生產者單次呼叫超過 ${CALL_TIMEOUT}s，判定卡住"
+    log "$STOP_REASON"
+    break
+  elif [ $rc -ne 0 ]; then
     STOP_REASON="生產者呼叫失敗，詳見 $LOG_FILE"
     log "$STOP_REASON"
     break
@@ -198,6 +251,9 @@ $(cat "$VERIFIER")
 ## 你要驗的迴圈定義（停止條件在裡面）
 $BODY
 
+## 這一關應該產出的檔案
+${TARGET_FILE:-（未指定）}
+
 ## 這一輪改了哪些檔案
 $(git status --porcelain)
 
@@ -211,7 +267,12 @@ $(git diff HEAD 2>/dev/null | head -500)
 EOF
 )"
 
-  if ! run_claude "$VERIFY_PROMPT"; then
+  run_claude "$VERIFY_PROMPT"; rc=$?
+  if [ $rc -eq 2 ]; then
+    STOP_REASON="驗證者單次呼叫超過 ${CALL_TIMEOUT}s，判定卡住"
+    log "$STOP_REASON"
+    break
+  elif [ $rc -ne 0 ]; then
     STOP_REASON="驗證者呼叫失敗，詳見 $LOG_FILE"
     log "$STOP_REASON"
     break
@@ -247,6 +308,21 @@ if [ "$ITER" -ge "$MAX_ITER" ] && [ "$STOP_REASON" = "未知" ]; then
   STOP_REASON="跑滿 $MAX_ITER 輪仍未通過驗證，交回人工判斷"
 fi
 
+# 通過驗證但檔案不在，等於沒做完
+EXIT_CODE=0
+case "$STOP_REASON" in
+  "驗證通過，停止條件達成")
+    if [ -n "$TARGET_FILE" ] && [ ! -f "$TARGET_FILE" ]; then
+      STOP_REASON="驗證說通過，但找不到產出檔 $TARGET_FILE"
+      EXIT_CODE=1
+    fi
+    ;;
+  "dry-run 結束") ;;
+  *) EXIT_CODE=1 ;;
+esac
+
+printf '%s' "$TOTAL_COST" > "$COST_FILE"
+
 log "─────── 迴圈結束 ───────"
 log "停止原因：$STOP_REASON"
 log "共 $ITER 輪｜累計花費 \$$TOTAL_COST"
@@ -260,3 +336,5 @@ log "狀態檔：$STATE_FILE"
   echo "- 花費：\$$TOTAL_COST / \$$MAX_COST"
   echo "- 停止原因：$STOP_REASON"
 } >> "$STATE_FILE"
+
+exit $EXIT_CODE
